@@ -7,6 +7,46 @@ from .utils import scrape_callback, send_file, llm_func
 from .record import take_image, record_video
 from .servos import move_with_prompt
 
+async def move_with_prompt(
+    robot: Robot,
+    llm_func: callable,
+    raw_move_str: int,
+    system_msg: str = SYSTEM_PROMPT,
+    move_msg: str = MOVE_MSG,
+) -> str:
+    msg: str = ""
+    desired_pose_name = llm_func(
+            max_tokens=8,
+            messages=[
+                {"role": "system", "content": f"{system_msg}\n{move_msg}"},
+                {"role": "user", "content": raw_move_str},
+            ]
+    )
+    msg += f"{MOVE_TOKEN} commanded pose is {desired_pose_name}\n"
+    desired_pose = POSES.get(desired_pose_name, None)
+    if desired_pose is not None:
+        return robot.move(desired_pose.angles)
+    else:
+        msg += f"ERROR: {desired_pose_name} is not a valid pose.\n"
+        return msg
+
+
+def test_servos_llm() -> None:
+    log.setLevel(logging.DEBUG)
+    log.debug("Testing move with prompt")
+    robot = Robot()
+    from .gpt import gpt_text
+    for raw_move_str in [
+        "go to the home position",
+        "check on your left",
+        "bogie on your right",
+        "what is on the floor",
+    ]:
+        msg = move_with_prompt(robot, gpt_text, raw_move_str)
+        print(msg)
+        time.sleep(1)
+    del robot
+
 async def main_loop(hparams: dict):
 
     # receive servo commands from brain

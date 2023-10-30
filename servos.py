@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import time
 from datetime import timedelta
@@ -19,16 +18,6 @@ from dynamixel_sdk import (
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
-
-ROBOT_TOKEN: str = "🤖"
-SERVO_TOKEN: str = "🦾"
-CAMERA_TOKEN: str = "📷"
-POSE_TOKEN: str = "🤸"
-MOVE_TOKEN: str = "🏃"
-
-SYSTEM_PROMPT: str = f"""
-You are an llm control unit for a robot arm called {ROBOT_TOKEN}.
-"""
 
 @dataclass
 class Servo:
@@ -97,7 +86,7 @@ def degrees_to_units(degree: int) -> int:
 def units_to_degrees(position: int) -> int:
     return int(position / DEGREE_TO_UNIT)
 
-class Robot:
+class Servos:
 
     def __init__(
         self,
@@ -255,53 +244,12 @@ class Robot:
 def test_servos() -> None:
     log.setLevel(logging.DEBUG)
     log.debug("Testing move")
-    robot = Robot()
+    robot = Servos()
     for pose in robot.poses.values():
         msg = robot.move(pose.angles)
         print(msg)
         time.sleep(1)
     del robot
 
-async def move_with_prompt(
-    robot: Robot,
-    llm_func: callable,
-    raw_move_str: int,
-    system_msg: str = SYSTEM_PROMPT,
-    move_msg: str = MOVE_MSG,
-) -> str:
-    msg: str = ""
-    desired_pose_name = llm_func(
-            max_tokens=8,
-            messages=[
-                {"role": "system", "content": f"{system_msg}\n{move_msg}"},
-                {"role": "user", "content": raw_move_str},
-            ]
-    )
-    msg += f"{MOVE_TOKEN} commanded pose is {desired_pose_name}\n"
-    desired_pose = POSES.get(desired_pose_name, None)
-    if desired_pose is not None:
-        return robot.move(desired_pose.angles)
-    else:
-        msg += f"ERROR: {desired_pose_name} is not a valid pose.\n"
-        return msg
-
-
-def test_servos_llm() -> None:
-    log.setLevel(logging.DEBUG)
-    log.debug("Testing move with prompt")
-    robot = Robot()
-    from .gpt import gpt_text
-    for raw_move_str in [
-        "go to the home position",
-        "check on your left",
-        "bogie on your right",
-        "what is on the floor",
-    ]:
-        msg = move_with_prompt(robot, gpt_text, raw_move_str)
-        print(msg)
-        time.sleep(1)
-    del robot
-
 if __name__ == "__main__":
     test_servos()
-    test_servos_llm()

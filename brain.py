@@ -12,7 +12,7 @@ import requests
 
 class MiniDocker:
 
-    def __init__(self, name: str = 'llava13b', port: str = '5000', warmup: int = 30):
+    def __init__(self, name: str = 'llava13b', port: str = '5000', warmup: int = 25):
         self.nuke()
         self.name, self.port, self.warmup = name, port, warmup
         self.proc = subprocess.Popen([
@@ -27,8 +27,8 @@ class MiniDocker:
     def nuke(self):
         containers = os.popen("docker ps -aq").read().strip()
         if containers:
-            os.system(f"docker kill {containers}")
             os.system(f"docker stop {containers}")
+            os.system(f"docker kill {containers}")
             os.system(f"docker rm {containers}")
         os.system("docker container prune -f")
 
@@ -37,26 +37,18 @@ class MiniDocker:
         self.nuke()
 
 
-async def run_vlm(
-    docker: MiniDocker,
-    brain_data_dir: str,
-    input_image_path: str,
-    vlm_log_filename: str,
-    prompt: str = "Is there a person in this image? Where are they? On the left? right? center?",
-    fps: int = 30,
-    docker_url: str = "http://localhost:5000/predictions",
-    **kwargs,
-):
+async def run_vlm(hparams: dict = HPARAMS):
     """
 # https://replicate.com/yorickvp/llava-13b
 docker run --name llava13b r8.im/yorickvp/llava-13b@sha256:2facb4a474a0462c15041b78b1ad70952ea46b5ec6ad29583c0b29dbd4249591
 docker commit llava13b llava13b
 # Use weights stored locally (also needs to download clip336)
 docker run -v /home/oop/dev/LLaVA/llava-v1.5-13b:/src/liuhaotian/llava-v1.5-13b --gpus=all llava13b
-docker commit llava13b llava13b
-
+docker commit FOO llava13b
     """
-    image_path = os.path.join(brain_data_dir, input_image_path)
+    prompt: str = hparams.get("vlm_prompt")
+    docker_url: str = hparams.get("vlm_docker_url")
+    image_path = os.path.join(hparams.get("brain_data_dir"), hparams.get("image_filename"))
     with open(image_path, "rb") as img_file:
         response = requests.post(
             docker_url,
@@ -89,8 +81,7 @@ async def main_loop(hparams: dict = HPARAMS):
     # results = await asyncio.gather(*_tasks, return_exceptions=True)
 
     # # ask VLM for commands
-
-    # results = await asyncio.gather(*_tasks, return_exceptions=True)
+    vlm_results = await asyncio.gather(run_vlm(hparams), return_exceptions=True)
     
     # # write commands, send commands
 
@@ -105,6 +96,4 @@ async def test(hparams: dict = HPARAMS):
 
 if __name__ == "__main__":
     docker = MiniDocker()
-    asyncio.run(main_loop(docker))
-    del docker
-    print("done")
+    asyncio.run(main_loop())
