@@ -14,7 +14,7 @@ def remote_chromium_gradio_ui(
     return subprocess.Popen(_cmd, stdin=subprocess.PIPE)
 
 def update_interface(servo1, servo2, servo3):
-    return image
+    return None
 
 # Sliders for each servo
 servo1_slider = gr.Slider(minimum=0, maximum=360, value=180, label='Servo 1')
@@ -26,7 +26,7 @@ image = gr.Image(shape=(480, 640), image_mode='L', invert_colors=True, label='Ca
 iface = gr.Interface(
     fn=update_interface,
     inputs=[servo1_slider, servo2_slider, servo3_slider],
-    outputs=[image],
+    outputs=[],
     live=True,
 )
 
