@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 from typing import Dict, List, Tuple
@@ -8,7 +9,7 @@ log = logging.getLogger(__name__)
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def gpt_text(
+async def gpt_text(
     messages: List[Dict[str, str]] = None,
     model="gpt-3.5-turbo",
     temperature: float = 0,
