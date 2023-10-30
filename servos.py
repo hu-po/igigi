@@ -19,6 +19,7 @@ from dynamixel_sdk import (
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
+
 ROBOT_TOKEN: str = "🤖"
 SERVO_TOKEN: str = "🦾"
 CAMERA_TOKEN: str = "📷"

@@ -10,8 +10,8 @@ ROBOT_DATA_DIR = "/home/pi/dev/data/"
 REMOTE_DATA_DIR = "/home/oop/dev/data/"
 REMOTE_USERNAME = "oop"
 REMOTE_IP = "192.168.1.44"
-VIDEO_DURATION = 3
-VIDEO_FPS = 30
+DEFAULT_VIDEO_DURATION = 1 # seconds
+DEFAULT_VIDEO_FPS = 30
 
 
 @dataclass
@@ -65,9 +65,10 @@ async def send_file(
 
 async def record_video(
     camera: Camera,
-    duration: int = VIDEO_DURATION,
-    fps: int = VIDEO_FPS,
+    **hparams,
 ) -> str:
+    duration: int = hparams.get("duration", DEFAULT_VIDEO_DURATION)
+    fps: int = hparams.get("fps", DEFAULT_VIDEO_FPS)
     msg: str = ""
     output_filename = f"{camera.name}.mp4"
     output_path = os.path.join(ROBOT_DATA_DIR, output_filename)
