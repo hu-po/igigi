@@ -252,6 +252,16 @@ class Robot:
         self._disable_torque()
         self.port_handler.closePort()
 
+def test_servos() -> None:
+    log.setLevel(logging.DEBUG)
+    log.debug("Testing move")
+    robot = Robot()
+    for pose in robot.poses.values():
+        msg = robot.move(pose.angles)
+        print(msg)
+        time.sleep(1)
+    del robot
+
 async def move_with_prompt(
     robot: Robot,
     llm_func: callable,
@@ -275,15 +285,6 @@ async def move_with_prompt(
         msg += f"ERROR: {desired_pose_name} is not a valid pose.\n"
         return msg
 
-def test_servos() -> None:
-    log.setLevel(logging.DEBUG)
-    log.debug("Testing move")
-    robot = Robot()
-    for pose in robot.poses.values():
-        msg = robot.move(pose.angles)
-        print(msg)
-        time.sleep(1)
-    del robot
 
 def test_servos_llm() -> None:
     log.setLevel(logging.DEBUG)

@@ -1,18 +1,12 @@
 import os
 import asyncio
-from datetime import timedelta
-
-ROBOT_DATA_DIR = "/home/pi/dev/data/"
-REMOTE_DATA_DIR = "/home/oop/dev/data/"
-REMOTE_USERNAME = "oop"
-REMOTE_IP = "192.168.1.44"
 
 async def scrape_callback(
     directory: str, 
     filename: str, 
-    callback: callable, 
-    interval: timedelta = timedelta(seconds=3), 
-    timeout: timedelta = timedelta(minutes=1)
+    callback: callable,
+    interval: int = 1, 
+    timeout: int = 60,
 ):
     try:
         async def _scrape():
@@ -23,9 +17,9 @@ async def scrape_callback(
                         await callback(full_path)
                     else:
                         callback(full_path)
-                await asyncio.sleep(interval.total_seconds())
+                await asyncio.sleep(interval)
         
-        await asyncio.wait_for(_scrape(), timeout=timeout.total_seconds())
+        await asyncio.wait_for(_scrape(), timeout=timeout)
     except asyncio.TimeoutError:
         print("Timeout reached. Stopping the function.")
     except Exception as e:
@@ -33,24 +27,42 @@ async def scrape_callback(
 
 async def send_file(
     filename: str,
-    robot_dir_path: str = ROBOT_DATA_DIR,
-    remote_dir_path: str = REMOTE_DATA_DIR,
-    username: str = REMOTE_USERNAME,
-    remote_ip: str = REMOTE_IP,
-) -> str:
-    msg: str = ""
-    local_path = os.path.join(robot_dir_path, filename)
+    local_dir_path: str,
+    remote_dir_path: str,
+    remote_username: str,
+    remote_ip: str,
+) -> None:
+    local_path = os.path.join(local_dir_path, filename)
     remote_path = os.path.join(remote_dir_path, filename)
-    cmd = ["scp", local_path, f"{username}@{remote_ip}:{remote_path}"]
+    cmd = ["scp", local_path, f"{remote_username}@{remote_ip}:{remote_path}"]
     print(f"Running command: {cmd}")
     process = await asyncio.create_subprocess_exec(
         *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
     stdout, stderr = await process.communicate()
-    msg += f"Sent {local_path} to {remote_path}\n"
-    if process.returncode != 0:
-        msg += f"ERROR on send: {stderr.decode()}"
-    return msg
+    print(f"Sent {local_path} to {remote_path}\n")
+
+async def llm_func(
+    llm_func: callable,
+    system_msg: str,
+    prompt_msg: str,
+    max_tokens: int,
+) -> str:
+    msg: str = ""
+    desired_pose_name = llm_func(
+            max_tokens=8,
+            messages=[
+                {"role": "system", "content": f"{system_msg}\n{move_msg}"},
+                {"role": "user", "content": raw_move_str},
+            ]
+    )
+    msg += f"{MOVE_TOKEN} commanded pose is {desired_pose_name}\n"
+    desired_pose = POSES.get(desired_pose_name, None)
+    if desired_pose is not None:
+        return robot.move(desired_pose.angles)
+    else:
+        msg += f"ERROR: {desired_pose_name} is not a valid pose.\n"
+        return msg
 
 
 # Example usage with an asynchronous callback:

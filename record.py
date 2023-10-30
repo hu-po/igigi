@@ -34,9 +34,9 @@ CAMERAS = [
 async def record_video(camera: Camera, **hparams) -> None:
     duration: int = hparams.get("duration", DEFAULT_VIDEO_DURATION)
     fps: int = hparams.get("fps", DEFAULT_VIDEO_FPS)
-    output_dir: str = hparams.get("robot_output_dir", os.environ["DATA_DIR"])
-    video_filename: str = hparams.get("robot_video_filename", f"{camera.name}.mp4")
-    videolog_filename: str = hparams.get("robot_videolog_filename", f"{camera.name}.txt")
+    output_dir: str = hparams.get("robot_data_dir", os.environ["DATA_DIR"])
+    video_filename: str = hparams.get("robot_video_filename", f"test.{camera.name}.mp4")
+    videolog_filename: str = hparams.get("robot_videolog_filename", f"test.{camera.name}.txt")
     video_output_path = os.path.join(output_dir, video_filename)
     videolog_output_path = os.path.join(output_dir, videolog_filename)
     videolog: str = ""
@@ -63,10 +63,10 @@ async def record_video(camera: Camera, **hparams) -> None:
         f.write(videolog)
 
 
-async def take_image(camera: Camera, **hparams) -> str:
-    output_dir: str = hparams.get("robot_output_dir", os.environ["DATA_DIR"])
-    image_filename: str = hparams.get("robot_image_output_filename", f"{camera.name}.png")
-    imagelog_filename: str = hparams.get("robot_imagelog_filename", f"{camera.name}.txt")
+async def take_image(camera: Camera, **hparams) -> None:
+    output_dir: str = hparams.get("robot_data_dir", os.environ["DATA_DIR"])
+    image_filename: str = hparams.get("robot_image_filename", f"test.{camera.name}.png")
+    imagelog_filename: str = hparams.get("robot_imagelog_filename", f"test.{camera.name}.txt")
     image_output_path = os.path.join(output_dir, image_filename)
     imagelog_output_path = os.path.join(output_dir, imagelog_filename)
     imagelog: str = ""
