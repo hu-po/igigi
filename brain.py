@@ -38,14 +38,6 @@ class MiniDocker:
 
 
 async def run_vlm(hparams: dict = HPARAMS):
-    """
-# https://replicate.com/yorickvp/llava-13b
-docker run --name llava13b r8.im/yorickvp/llava-13b@sha256:2facb4a474a0462c15041b78b1ad70952ea46b5ec6ad29583c0b29dbd4249591
-docker commit llava13b llava13b
-# Use weights stored locally (also needs to download clip336)
-docker run -v /home/oop/dev/LLaVA/llava-v1.5-13b:/src/liuhaotian/llava-v1.5-13b --gpus=all llava13b
-docker commit FOO llava13b
-    """
     prompt: str = hparams.get("vlm_prompt")
     docker_url: str = hparams.get("vlm_docker_url")
     image_path = os.path.join(hparams.get("brain_data_dir"), hparams.get("image_filename"))
@@ -60,8 +52,7 @@ docker commit FOO llava13b
                 },
             },
         )
-        time.sleep(10)
-        return response.json()
+        return ''.join(response.json()["output"])
 
 
 async def main_loop(hparams: dict = HPARAMS):
