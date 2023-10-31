@@ -1,12 +1,11 @@
 import asyncio
-import os
 
 import openai
 
-from .hparams import HPARAMS
-from .utils import scrape, send_file
-from .record import take_image, record_video, CAMERAS
-from .servos import Servos
+from hparams import HPARAMS
+from utils import scrape, send_file
+from record import take_image, record_video, CAMERAS
+from servos import Servos
 
 
 async def move_servos(
