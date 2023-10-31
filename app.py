@@ -32,7 +32,7 @@ class ChromeUI:
             with gr.Column():
                 gr.Video(self.video_path, label="Video")
                 gr.Image(self.image_path, label="Image")
-                with open("/src/robot_log.txt", "r") as f:
+                with open(self.text_path, "r") as f:
                     text = f.read()
                 gr.Textbox(text, label="Text")
         demo.launch()
