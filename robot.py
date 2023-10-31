@@ -1,12 +1,13 @@
 import asyncio
-
+import subprocess
+import os
 import openai
 
 from hparams import HPARAMS
 from utils import scrape, send_file
 from record import take_image, record_video, CAMERAS
 from servos import Servos
-
+from app import ChromeUI
 
 async def move_servos(
     servos: Servos,
@@ -36,7 +37,7 @@ async def move_servos(
     return servolog
 
 
-async def main_loop(servos: Servos, hparams: dict = HPARAMS):
+async def main_loop(servos: Servos, ui: ChromeUI, hparams: dict = HPARAMS):
     print("Starting main loop")
     print("Batch 1 of tasks")
     results = await asyncio.gather(
@@ -90,18 +91,20 @@ async def main_loop(servos: Servos, hparams: dict = HPARAMS):
             hparams.get("brain_username"),
             hparams.get("brain_ip"),
         ),
-        # send_file(
-        #     hparams.get("video_filename"),
-        #     hparams.get("robot_data_dir"),
-        #     hparams.get("brain_data_dir"),
-        #     hparams.get("brain_username"),
-        #     hparams.get("brain_ip"),
-        # ),
-        # update_ui(),
+        send_file(
+            hparams.get("video_filename"),
+            hparams.get("robot_data_dir"),
+            hparams.get("brain_data_dir"),
+            hparams.get("brain_username"),
+            hparams.get("brain_ip"),
+        ),
+        ui.update_interface(),
         return_exceptions=True,
     )
 
 
 if __name__ == "__main__":
+    # singletons for servo and ui
     servos = Servos()
-    asyncio.run(main_loop(servos))
+    ui = ChromeUI()
+    asyncio.run(main_loop(servos, ui))
