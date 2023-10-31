@@ -37,7 +37,7 @@ async def record_video(
     fps: int = 30,
 ) -> None:
     print(f"Recording video with {camera.name}")
-    output_path = os.path.join(output_dir, filename),
+    output_path = os.path.join(output_dir, filename)
     log: str = ""
     cmd = [
         "ffmpeg", "-y",

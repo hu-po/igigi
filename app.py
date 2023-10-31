@@ -57,6 +57,7 @@ if __name__ == "__main__":
         )
     except KeyboardInterrupt:
         print("Remote chromium browser terminated.")
-        sys.exit(0)
+        process.terminate()
+        os.system("killall chromium-browser")
     except subprocess.CalledProcessError:
         print("Error: chromium process failed.")
