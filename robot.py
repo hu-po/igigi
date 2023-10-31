@@ -18,9 +18,9 @@ async def move_servos(
 ) -> str:
     print(f"Moving servos with {user_prompt}")
     # Add actions to the system prompt
-    for pose in servos.poses:
+    for pose in servos.poses.values():
         system_prompt += f"{pose.name} : {pose.desc}\n"
-    for move in servos.moves:
+    for move in servos.moves.values():
         system_prompt += f"{move.name} : {move.desc}\n"
     response = openai.ChatCompletion.create(
         messages=[

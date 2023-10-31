@@ -49,7 +49,7 @@ async def record_video(
         "-c:v", "h264",
         output_path
     ]
-    log += "Recording video using " + " ".join(cmd)
+    log += f"Recording video using {cmd}"
     process = await asyncio.create_subprocess_exec(
         *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
