@@ -1,8 +1,7 @@
 import asyncio
 import os
 
-from openai import OpenAI
-
+import openai
 
 from .hparams import HPARAMS
 from .utils import scrape, send_file
@@ -12,14 +11,13 @@ from .servos import Servos
 
 async def move_servos(
     servos: Servos,
-    llm,
     system_prompt: str,
     user_prompt: str,
     model: str = "gpt-3.5-turbo",
     temperature: int = 0.2,
     max_tokens: int = 32,
 ) -> str:
-    response = llm.chat_completions.create(
+    response = openai.ChatCompletion.create(
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
@@ -33,7 +31,7 @@ async def move_servos(
     return servolog
 
 
-async def main_loop(servos: Servos, llm, hparams: dict = HPARAMS):
+async def main_loop(servos: Servos, hparams: dict = HPARAMS):
     results = await asyncio.gather(
         scrape(
             hparams.get("commands_filename"),
@@ -58,7 +56,7 @@ async def main_loop(servos: Servos, llm, hparams: dict = HPARAMS):
             hparams.get("brain_ip"),
         ),
         move_servos(
-            servos, llm,
+            servos,
             hparams.get("llm_system_prompt"),
             hparams.get("llm_move_prompt"),
             hparams.get("llm_model"),
@@ -95,6 +93,5 @@ async def main_loop(servos: Servos, llm, hparams: dict = HPARAMS):
 
 
 if __name__ == "__main__":
-    llm = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     servos = Servos()
-    asyncio.run(main_loop(servos, llm))
+    asyncio.run(main_loop(servos))
