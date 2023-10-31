@@ -38,6 +38,7 @@ async def move_servos(
 
 async def main_loop(servos: Servos, hparams: dict = HPARAMS):
     print("Starting main loop")
+    print("Batch 1 of tasks")
     results = await asyncio.gather(
         scrape(
             hparams.get("commands_filename"),
@@ -52,7 +53,8 @@ async def main_loop(servos: Servos, hparams: dict = HPARAMS):
         ),
         return_exceptions=True,
     )
-
+    print(results)
+    print("Batch 2 of tasks")
     results = await asyncio.gather(
         send_file(
             hparams.get("image_filename"),
@@ -78,7 +80,8 @@ async def main_loop(servos: Servos, hparams: dict = HPARAMS):
         ),
         return_exceptions=True,
     )
-
+    print(results)
+    print("Batch 3 of tasks")
     results = await asyncio.gather(
         send_file(
             hparams.get("robotlog_filename"),
