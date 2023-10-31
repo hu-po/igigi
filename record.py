@@ -1,5 +1,6 @@
 import asyncio
 import os
+from typing import Dict
 from dataclasses import dataclass
 
 DEFAULT_VIDEO_DURATION = 1 # seconds
@@ -14,22 +15,22 @@ class Camera:
     desc: str
 
 
-CAMERAS = [
-    Camera(
+CAMERAS: Dict[str, Camera] = {
+    "stereo" : Camera(
         device="/dev/video0",
         name="stereo",
         width=1280,
         height=480,
         desc="stereo camera on the face facing forward",
     ),
-    Camera(
+    "mono" : Camera(
         device="/dev/video2",
         name="mono",
         width=640,
         height=480,
         desc="monocular camera on the chest facing forward",
     ),
-]
+}
 
 async def record_video(camera: Camera, **hparams) -> None:
     duration: int = hparams.get("duration", DEFAULT_VIDEO_DURATION)
@@ -94,10 +95,10 @@ async def take_image(camera: Camera, **hparams) -> None:
 async def test_cameras():
     print(f"Testing cameras: {CAMERAS}")
     print("Testing take_image")
-    image_tasks = [take_image(camera) for camera in CAMERAS]
+    image_tasks = [take_image(camera) for camera in CAMERAS.values()]
     _ = await asyncio.gather(*image_tasks, return_exceptions=True)
     print("Testing record_video")
-    video_tasks = [record_video(camera) for camera in CAMERAS]
+    video_tasks = [record_video(camera) for camera in CAMERAS.values()]
     _ = await asyncio.gather(*video_tasks, return_exceptions=True)
 
 

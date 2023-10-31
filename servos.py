@@ -26,17 +26,17 @@ class Servo:
     range: Tuple[int, int] # (min, max) position values for servos (0, 4095)
     desc: str # description of servo for llm use
 
-SERVOS: List[Servo] = [
-    Servo(1, "roll", (1761, 2499), "rolls the neck left and right rotating the view, roll"),
-    Servo(2, "tilt", (979, 2223), "tilts the head up and down vertically, pitch"),
-    Servo(3, "pan", (988, 3007), "pans the head side to side horizontally, yaw")
-]
+SERVOS: Dict[str, Servo] = {
+    "roll" : Servo(1, "roll", (1761, 2499), "rolls the neck left and right rotating the view, roll"),
+    "tilt" : Servo(2, "tilt", (979, 2223), "tilts the head up and down vertically, pitch"),
+    "pan" : Servo(3, "pan", (988, 3007), "pans the head side to side horizontally, yaw")
+}
 
 @dataclass
 class Pose:
-    name: str # name of pose for llm use
-    angles: List[int] # list of int angles in degrees (0, 360)
-    desc: str # description of position for llm use
+    name: str # name of static pose for llm use
+    angles: List[int] # list of int angles in degrees (0, 360) describing static pose
+    desc: str # description of static pose for llm use
 
 POSES: Dict[str, Pose] = {
     "home" : Pose("home", [180, 211, 180], "home position or look up"),
@@ -44,6 +44,19 @@ POSES: Dict[str, Pose] = {
     "face_left" : Pose("face_left", [215, 130, 151], "looking forward, head tilted right"),
     "face_right" : Pose("face_right", [145, 130, 209], "looking forward, head tilted left"),
     "face_down": Pose("face_down", [180, 94, 180], "looking down, facing forward")
+}
+
+@dataclass
+class Move:
+    name: str # name of movement for llm use
+    vector: List[int] # movement vector in degrees (0, 360) one for each servo
+    desc: str # description of position for llm use
+
+MOVES: Dict[str, Move] = {
+    "up" : Move("up", [0, 10, 0], "look more upwards"),
+    "down" : Move("down", [0, -10, 0], "look more down"),
+    "left" : Move("left", [0, 0, -10], "look a little to the left"),
+    "right" : Move("right", [0, 0, 10], "look to the right"),
 }
 
 # Convert servo units into degrees for readability
@@ -60,8 +73,9 @@ class Servos:
 
     def __init__(
         self,
-        servos: List[Servo] = SERVOS,
+        servos: Dict[str, Servo] = SERVOS,
         poses: Dict[str, Pose] = POSES,
+        moves: Dict[str, Move] = MOVES,
         protocol_version: float = 2.0,
         baudrate: int = 57600,
         device_name: str = "/dev/ttyUSB0",
@@ -71,7 +85,7 @@ class Servos:
         torque_enable: int = 1,
         torque_disable: int = 0,
     ):
-        self.servos = servos  # List of Servo objects to control
+        self.servos = servos.values()
         for servo in self.servos:
             log.debug("---- Initialize servo ----")
             log.debug(f"servo: {servo.name}")
@@ -80,6 +94,7 @@ class Servos:
             log.debug(f"description: {servo.desc}")
         self.num_servos: int = len(self.servos)  # Number of servos to control
         self.poses = poses # Dict of Pose objects to control
+        self.moves = moves # Dict of Move objects to control
 
         # Dynamixel communication parameters
         self.protocol_version = protocol_version  # DYNAMIXEL Protocol version (1.0 or 2.0)

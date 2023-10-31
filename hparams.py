@@ -2,8 +2,8 @@ HPARAMS = {
     "robot_token": "🤖",
     "servo_token": "🦾",
     "camera_token": "📷",
-    "pose_token": "🤸",
-    "move_token": "🏃",
+    # "pose_token": "🤸",
+    # "move_token": "🏃",
 
     "vlm_prompt" : "Is there a person in this image? Where are they? On the left? right? center?",
     "vlm_docker_url" : "http://localhost:5000/predictions",

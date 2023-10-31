@@ -1,10 +1,8 @@
 import asyncio
 import os
-import sys
 import subprocess
 import time
 import base64
-import uuid
 
 from .utils import scrape, send_file
 from hparams import HPARAMS
