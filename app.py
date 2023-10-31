@@ -1,5 +1,6 @@
 import os
 import subprocess
+import time
 
 import gradio as gr
 from hparams import HPARAMS
@@ -50,3 +51,6 @@ if __name__ == "__main__":
         HPARAMS.get("image_filename"),
         HPARAMS.get("robotlog_filename"),
     )
+    for i in range(1000):
+        ui.update_interface()
+        time.sleep(1)
