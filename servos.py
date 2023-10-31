@@ -52,11 +52,12 @@ class Move:
     vector: List[int] # movement vector in degrees (0, 360) one for each servo
     desc: str # description of position for llm use
 
+VELOCITY: int = 10 # degrees per move
 MOVES: Dict[str, Move] = {
-    "up" : Move("up", [0, 10, 0], "look more upwards"),
-    "down" : Move("down", [0, -10, 0], "look more down"),
-    "left" : Move("left", [0, 0, -10], "look a little to the left"),
-    "right" : Move("right", [0, 0, 10], "look to the right"),
+    "up" : Move("up", [0, VELOCITY, 0], "look more upwards"),
+    "down" : Move("down", [0, -VELOCITY, 0], "look more down"),
+    "left" : Move("left", [0, 0, -VELOCITY], "look a little to the left"),
+    "right" : Move("right", [0, 0, VELOCITY], "look to the right"),
 }
 
 # Convert servo units into degrees for readability
