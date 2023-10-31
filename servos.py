@@ -127,7 +127,7 @@ class Servos:
     ) -> str:
         timeout: timedelta = timedelta(seconds=timeout)
         start_time = time.time()
-        move_log: str = f"Started action at {start_time}."
+        move_log: str = "" #f"Started action at {start_time}."
         # Check to see if action is one of the static poses
         desired_pose = self.poses.get(action, None)
         if desired_pose is not None:
@@ -142,23 +142,23 @@ class Servos:
             else:
                 move_log += f"ERROR: Could not find a match for desired action {action}.\n"
                 return move_log
-        move_log += f"Servos commanded to {goal_position}."
+        move_log += f"Goal position is {goal_position}."
         try:
             while True:
                 elapsed_time = time.time() - start_time
                 self._write_position(goal_position)
                 true_positions = self._read_pos()
-                move_log += f"Servos at position {true_positions}."
+                move_log += f"Current position is {true_positions}."
                 if epsilon > sum(abs(true_positions[i] - goal_position[i]) for i in range(len(goal_position))):
-                    move_log += f"Action succeeded in {elapsed_time} seconds.\n"
+                    move_log += f"Action succeeded in {elapsed_time} seconds."
                     break
                 if elapsed_time > timeout.total_seconds():
-                    move_log += f"Action timed out after {elapsed_time} seconds.\n"
+                    move_log += f"Action timed out after {elapsed_time} seconds."
                     break 
         except Exception as e:
             move_log += f"Action failed with exception {e}"
             log.warning(move_log)
-        return move_log
+        return move_log + "\n"
 
     def _write_position(self, positions: List[int]) -> str:
         msg: str = ""
@@ -238,7 +238,7 @@ class Servos:
                 log.error(f"ERROR: {self.packet_handler.getRxPacketError(dxl_error)}")
 
     def __del__(self, *args, **kwargs) -> None:
-        self.move(self.poses["home"].angles)
+        self.move("home")
         self._disable_torque()
         self.port_handler.closePort()
 
@@ -247,14 +247,10 @@ def test_servos() -> None:
     log.debug("Testing move")
     robot = Servos()
     for pose in robot.poses.values():
-        msg = robot.move(pose.name)
-        print(msg)
-        time.sleep(1)
+        print(robot.move(pose.name))
     robot.move("home")
     for move in robot.moves.values():
-        msg = robot.move(move.name)
-        print(msg)
-        time.sleep(1)
+        print(robot.move(move.name))
 
 
 if __name__ == "__main__":
