@@ -121,29 +121,44 @@ class Servos:
 
     def move(
         self,
-        goal_positions: List[int],
-        epsilon: int = 10, # degrees
-        timeout: timedelta = timedelta(seconds=1), #timeout
+        action: str,
+        epsilon: int = 3, # degrees
+        timeout: int = 1, # timeout for a move in seconds
     ) -> str:
-        msg: str = ""
+        timeout: timedelta = timedelta(seconds=timeout)
         start_time = time.time()
+        move_log: str = f"Started action at {start_time}."
+        # Check to see if action is one of the static poses
+        desired_pose = self.poses.get(action, None)
+        if desired_pose is not None:
+            move_log += f"Action is moving to static position {desired_pose}"
+            goal_positions = desired_pose.angles
+        else:
+            # Check to see if action is one of the moves
+            desired_move = self.moves.get(action, None)
+            if desired_move is not None:
+                move_log += f"Action is moving {desired_move}"
+                goal_positions = [sum(x) for x in zip(self._read_pos(), desired_move.vector)]
+            else:
+                move_log += f"ERROR: Could not find a match for desired action {action}.\n"
+                return move_log
+        move_log += f"Servos commanded to {goal_positions}."
         try:
             while True:
                 elapsed_time = time.time() - start_time
-                msg += f"{ROBOT_TOKEN} commanded to position {goal_positions}\n"
                 self._write_position(goal_positions)
                 true_positions = self._read_pos()
-                msg += f"{ROBOT_TOKEN} at position {true_positions}\n"
+                move_log += f"Servos at position {true_positions}."
                 if epsilon > sum(abs(true_positions[i] - goal_positions[i]) for i in range(len(goal_positions))):
-                    msg += f"{MOVE_TOKEN} succeeded in {elapsed_time} seconds.\n"
+                    move_log += f"Action succeeded in {elapsed_time} seconds.\n"
                     break
                 if elapsed_time > timeout.total_seconds():
-                    msg += f"{MOVE_TOKEN} timed out after {elapsed_time} seconds.\n"
+                    move_log += f"Action timed out after {elapsed_time} seconds.\n"
                     break 
         except Exception as e:
-            msg += f"{MOVE_TOKEN} failed with exception {e}"
-            log.warning(msg)
-        return msg
+            move_log += f"Action failed with exception {e}"
+            log.warning(move_log)
+        return move_log
 
     def _write_position(self, positions: List[int]) -> str:
         msg: str = ""
@@ -232,10 +247,15 @@ def test_servos() -> None:
     log.debug("Testing move")
     robot = Servos()
     for pose in robot.poses.values():
-        msg = robot.move(pose.angles)
+        msg = robot.move(pose.name)
         print(msg)
         time.sleep(1)
-    del robot
+    robot.move("home")
+    for move in robot.moves.values():
+        msg = robot.move(move.name)
+        print(msg)
+        time.sleep(1)
+
 
 if __name__ == "__main__":
     test_servos()

@@ -29,6 +29,7 @@ async def move_servos(
         max_tokens=max_tokens,
     )
     reply: str = response.choices[0].message.content
+    servos.move(reply)
     # desired_pose = POSES.get(desired_pose_name, None)
     # if desired_pose is not None:
     #     return servos.move(desired_pose.angles)
@@ -57,7 +58,14 @@ async def main_loop(servos: Servos, llm, hparams: dict = HPARAMS):
             hparams.get("brain_username"),
             hparams.get("brain_ip"),
         ),
-        move_servos(servos, llm),
+        move_servos(
+            servos, llm,
+            hparams.get("llm_system_prompt"),
+            hparams.get("llm_move_prompt"),
+            hparams.get("llm_model"),
+            hparams.get("llm_temperature"),
+            hparams.get("llm_max_tokens"),
+        ),
         record_video(),
         return_exceptions=True,
     )
