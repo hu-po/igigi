@@ -7,7 +7,7 @@ from openai import OpenAI
 from .hparams import HPARAMS
 from .utils import scrape, send_file
 from .record import take_image, record_video, CAMERAS
-from .servos import Servos, POSES, MOVES
+from .servos import Servos
 
 
 async def move_servos(
@@ -29,13 +29,8 @@ async def move_servos(
         max_tokens=max_tokens,
     )
     reply: str = response.choices[0].message.content
-    servos.move(reply)
-    # desired_pose = POSES.get(desired_pose_name, None)
-    # if desired_pose is not None:
-    #     return servos.move(desired_pose.angles)
-    # else:
-    #     msg += f"ERROR: {desired_pose_name} is not a valid pose.\n"
-    #     return msg
+    servolog = servos.move(reply)
+    return servolog
 
 
 async def main_loop(servos: Servos, llm, hparams: dict = HPARAMS):
@@ -46,7 +41,11 @@ async def main_loop(servos: Servos, llm, hparams: dict = HPARAMS):
             hparams.get("scrape_interval"),
             hparams.get("scrape_timeout"),
         ),
-        take_image(),
+        take_image(
+            CAMERAS["stereo"],
+            hparams.get("image_filename"),
+            hparams.get("robot_data_path"),
+        ),
         return_exceptions=True,
     )
 
@@ -66,7 +65,13 @@ async def main_loop(servos: Servos, llm, hparams: dict = HPARAMS):
             hparams.get("llm_temperature"),
             hparams.get("llm_max_tokens"),
         ),
-        record_video(),
+        record_video(
+            CAMERAS["stereo"],
+            hparams.get("video_filename"),
+            hparams.get("robot_data_path"),
+            hparams.get("video_duration"),
+            hparams.get("video_fps"),
+        ),
         return_exceptions=True,
     )
 

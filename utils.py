@@ -42,3 +42,13 @@ async def send_file(
     )
     stdout, stderr = await process.communicate()
     print(f"Sent {local_path} to {remote_path}\n")
+
+
+async def write_log(
+    log: str,
+    filename: str,
+    output_dir: str,
+):
+    output_path: str = os.path.join(output_dir, filename)
+    with open(output_path, "w") as f:
+        f.write(log)
