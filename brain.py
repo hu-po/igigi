@@ -51,7 +51,15 @@ async def run_vlm(prompt: str, docker_url: str, image_filepath: str):
 
 
 async def main_loop(hparams: dict = HPARAMS):
-
+    """
+        the following this is a set of asynchronous functions
+        some functions require the output of other functions
+        based on previous history you must select one of these functions
+        the functions are
+        
+        the history is
+        
+    """
     results = await asyncio.gather(
         scrape(
             hparams.get("robotlog_filename"),
@@ -67,7 +75,6 @@ async def main_loop(hparams: dict = HPARAMS):
         ),
     return_exceptions=True)
 
-    # # ask VLM for commands
     results = await asyncio.gather(
         run_vlm(
             hparams.get("vlm_prompt"),
@@ -76,9 +83,6 @@ async def main_loop(hparams: dict = HPARAMS):
         ),
     return_exceptions=True)
 
-    # write commands to file
-
-    # send commands to robot
     results = await asyncio.gather(
         send_file(
             hparams.get("commands_filename"),
