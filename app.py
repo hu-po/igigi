@@ -24,6 +24,8 @@ class ChromeUI:
         _cmd = ["chromium-browser", "--kiosk", f"http://localhost:{localhost_port}"]
         self.proc = subprocess.Popen(_cmd, stdin=subprocess.PIPE)
 
+        self.update_interface()
+
     def update_interface(self):
         with gr.Blocks() as demo:
             gr.Markdown("# IGIGI")
