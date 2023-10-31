@@ -22,7 +22,7 @@ HPARAMS = {
     "robot_username" : "pi",
 
     # The visualizer is a linux machine that visualizes the robot in a VR environment
-    "visualizer_data_dir" : "/home/oop/dev/data/",
+    "visualizer_data_dir" : "/home/ook/dev/data/",
     "visualizer_ip" : "192.168.1.10",
     "visualizer_username" : "ook",
     
@@ -30,7 +30,7 @@ HPARAMS = {
     # logfiles are plaintext intended to be read by a LLM
 
     "scrape_interval" : 0.1, # seconds to wait before scraping a folder again for a file
-    "scrape_timeout" : 10, # timeout in seconds for scraping a folder for a file
+    "scrape_timeout" : 2, # timeout in seconds for scraping a folder for a file
 
     # images are generally passed from robot to brain
     "image_filename" : "igigi.image.png",

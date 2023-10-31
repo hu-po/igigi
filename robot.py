@@ -34,14 +34,14 @@ async def main_loop(servos: Servos, hparams: dict = HPARAMS):
     results = await asyncio.gather(
         scrape(
             hparams.get("commands_filename"),
-            hparams.get("brain_data_dir"),
+            hparams.get("robot_data_dir"),
             hparams.get("scrape_interval"),
             hparams.get("scrape_timeout"),
         ),
         take_image(
             CAMERAS["stereo"],
             hparams.get("image_filename"),
-            hparams.get("robot_data_path"),
+            hparams.get("robot_data_dir"),
         ),
         return_exceptions=True,
     )
@@ -49,8 +49,8 @@ async def main_loop(servos: Servos, hparams: dict = HPARAMS):
     results = await asyncio.gather(
         send_file(
             hparams.get("image_filename"),
-            hparams.get("robot_data_path"),
-            hparams.get("brain_data_path"),
+            hparams.get("robot_data_dir"),
+            hparams.get("brain_data_dir"),
             hparams.get("brain_username"),
             hparams.get("brain_ip"),
         ),
@@ -65,7 +65,7 @@ async def main_loop(servos: Servos, hparams: dict = HPARAMS):
         record_video(
             CAMERAS["stereo"],
             hparams.get("video_filename"),
-            hparams.get("robot_data_path"),
+            hparams.get("robot_data_dir"),
             hparams.get("video_duration"),
             hparams.get("video_fps"),
         ),
@@ -74,19 +74,20 @@ async def main_loop(servos: Servos, hparams: dict = HPARAMS):
 
     results = await asyncio.gather(
         send_file(
-            hparams.get("video_filename"),
-            hparams.get("robot_data_path"),
-            hparams.get("brain_data_path"),
+            hparams.get("robotlog_filename"),
+            hparams.get("robot_data_dir"),
+            hparams.get("brain_data_dir"),
             hparams.get("brain_username"),
             hparams.get("brain_ip"),
         ),
-        send_file(
-            hparams.get("robot_log_filename"),
-            hparams.get("robot_data_path"),
-            hparams.get("brain_data_path"),
-            hparams.get("brain_username"),
-            hparams.get("brain_ip"),
-        ),
+        # send_file(
+        #     hparams.get("video_filename"),
+        #     hparams.get("robot_data_dir"),
+        #     hparams.get("brain_data_dir"),
+        #     hparams.get("brain_username"),
+        #     hparams.get("brain_ip"),
+        # ),
+        # update_ui(),
         return_exceptions=True,
     )
 
