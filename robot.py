@@ -2,87 +2,87 @@ import asyncio
 import os
 import sys
 
+from openai import OpenAI
+
+
 from .hparams import HPARAMS
-from .utils import scrape_callback, send_file, llm_func
+from .utils import scrape, send_file
 from .record import take_image, record_video
-from .servos import move_with_prompt
+from .servos import Servos
 
-async def move_with_prompt(
-    robot: Robot,
-    llm_func: callable,
-    raw_move_str: int,
-    system_msg: str = SYSTEM_PROMPT,
-    move_msg: str = MOVE_MSG,
+
+async def move_servos(
+    servos: Servos,
+    llm,
+    system_prompt: str,
+    user_prompt: str,
+    model: str = "gpt-3.5-turbo",
+    temperature: int = 0.2,
+    max_tokens: int = 32,
 ) -> str:
-    msg: str = ""
-    desired_pose_name = llm_func(
-            max_tokens=8,
-            messages=[
-                {"role": "system", "content": f"{system_msg}\n{move_msg}"},
-                {"role": "user", "content": raw_move_str},
-            ]
+    response = llm.chat_completions.create(
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        model=model,
+        temperature=temperature,
+        max_tokens=max_tokens,
     )
-    msg += f"{MOVE_TOKEN} commanded pose is {desired_pose_name}\n"
-    desired_pose = POSES.get(desired_pose_name, None)
-    if desired_pose is not None:
-        return robot.move(desired_pose.angles)
-    else:
-        msg += f"ERROR: {desired_pose_name} is not a valid pose.\n"
-        return msg
+    reply: str = response.choices[0].message.content
+    # desired_pose = POSES.get(desired_pose_name, None)
+    # if desired_pose is not None:
+    #     return servos.move(desired_pose.angles)
+    # else:
+    #     msg += f"ERROR: {desired_pose_name} is not a valid pose.\n"
+    #     return msg
 
 
-def test_servos_llm() -> None:
-    log.setLevel(logging.DEBUG)
-    log.debug("Testing move with prompt")
-    robot = Robot()
-    from .gpt import gpt_text
-    for raw_move_str in [
-        "go to the home position",
-        "check on your left",
-        "bogie on your right",
-        "what is on the floor",
-    ]:
-        msg = move_with_prompt(robot, gpt_text, raw_move_str)
-        print(msg)
-        time.sleep(1)
-    del robot
-
-async def main_loop(hparams: dict):
-
-    # receive servo commands from brain
-    scrape_callback(
-        hparams.get("brain_data_dir"),
-        hparams.get("commands_filename"),
-        llm_func,
-        hparams.get("interval"),
-        hparams.get("timeout"),
+async def main_loop(servos: Servos, llm, hparams: dict = HPARAMS):
+    results = await asyncio.gather(
+        scrape(
+            hparams.get("commands_filename"),
+            hparams.get("brain_data_dir"),
+            hparams.get("scrape_interval"),
+            hparams.get("scrape_timeout"),
+        ),
+        take_image(),
+        return_exceptions=True,
     )
 
-    # initialize robot
-
-    # take image
-
-    # send image to brain
-    send_file(
-        filename: str,
-        local_dir_path: str,
-        remote_dir_path: str,
-        remote_username: str,
-        remote_ip: str,
+    results = await asyncio.gather(
+        send_file(
+            hparams.get("image_filename"),
+            hparams.get("robot_data_path"),
+            hparams.get("brain_data_path"),
+            hparams.get("brain_username"),
+            hparams.get("brain_ip"),
+        ),
+        move_servos(servos, llm),
+        record_video(),
+        return_exceptions=True,
     )
 
-    # move servos based on commands
-
-    image_tasks = [take_image(camera) for camera in CAMERAS]
-    results = await asyncio.gather(*image_tasks, return_exceptions=True)
-
-    video_tasks = [record_video(camera) for camera in CAMERAS]
-    results = await asyncio.gather(*video_tasks, return_exceptions=True)
-
-async def test(hparams: dict):
-    pass
+    results = await asyncio.gather(
+        send_file(
+            hparams.get("video_filename"),
+            hparams.get("robot_data_path"),
+            hparams.get("brain_data_path"),
+            hparams.get("brain_username"),
+            hparams.get("brain_ip"),
+        ),
+        send_file(
+            hparams.get("robot_log_filename"),
+            hparams.get("robot_data_path"),
+            hparams.get("brain_data_path"),
+            hparams.get("brain_username"),
+            hparams.get("brain_ip"),
+        ),
+        return_exceptions=True,
+    )
 
 
 if __name__ == "__main__":
-    asyncio.run(test())
-    asyncio.run(main_loop())
+    llm = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    servos = Servos()
+    asyncio.run(main_loop(servos, llm))

@@ -9,6 +9,7 @@ import gradio as gr
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
+
 def remote_chromium_gradio_ui(
     display_number: str = "0.0",
     localhost_port: str = "7860",
@@ -18,14 +19,16 @@ def remote_chromium_gradio_ui(
     _cmd = ["chromium-browser", "--kiosk", f"http://localhost:{localhost_port}"]
     return subprocess.Popen(_cmd, stdin=subprocess.PIPE)
 
+
 def update_interface(servo1, servo2, servo3):
     return None
 
+
 # Sliders for each servo
-servo1_slider = gr.Slider(minimum=0, maximum=360, value=180, label='Servo 1')
-servo2_slider = gr.Slider(minimum=0, maximum=360, value=180, label='Servo 2')
-servo3_slider = gr.Slider(minimum=0, maximum=360, value=180, label='Servo 3')
-image = gr.Image(shape=(480, 640), image_mode='L', invert_colors=True, label='Camera')
+servo1_slider = gr.Slider(minimum=0, maximum=360, value=180, label="Servo 1")
+servo2_slider = gr.Slider(minimum=0, maximum=360, value=180, label="Servo 2")
+servo3_slider = gr.Slider(minimum=0, maximum=360, value=180, label="Servo 3")
+image = gr.Image(shape=(480, 640), image_mode="L", invert_colors=True, label="Camera")
 
 # Creating the interface
 iface = gr.Interface(

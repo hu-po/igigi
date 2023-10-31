@@ -32,17 +32,6 @@ SERVOS: List[Servo] = [
     Servo(3, "pan", (988, 3007), "pans the head side to side horizontally, yaw")
 ]
 
-SERVOS_MSG: str = f"""
-{ROBOT_TOKEN} has {len(SERVOS)} servos {SERVO_TOKEN} forming a kinematic chain
-@dataclass
-class Servo:
-    id: int # dynamixel id for servo
-    name: str # name of servo for llm use
-    range: Tuple[int, int] # (min, max) position values for servos in units (0, 4095)
-    desc: str # description of servo for llm use
-{SERVO_TOKEN}: List[Servo] = [{"".join([str(s) for s in SERVOS])}]
-"""
-
 @dataclass
 class Pose:
     name: str # name of pose for llm use
@@ -52,29 +41,10 @@ class Pose:
 POSES: Dict[str, Pose] = {
     "home" : Pose("home", [180, 211, 180], "home position or look up"),
     "forward" : Pose("forward", [180, 140, 180], "look ahead, facing forward"),
-    "tilt_left" : Pose("tilt_left", [215, 130, 151], "looking forward, head tilted right"),
-    "tilt_right" : Pose("tilt_right", [145, 130, 209], "looking forward, head tilted left"),
+    "face_left" : Pose("face_left", [215, 130, 151], "looking forward, head tilted right"),
+    "face_right" : Pose("face_right", [145, 130, 209], "looking forward, head tilted left"),
     "face_down": Pose("face_down", [180, 94, 180], "looking down, facing forward")
 }
-
-POSES_MSG: str = f"""
-{ROBOT_TOKEN} can be put into {len(POSES)} different poses {POSE_TOKEN}
-Each {POSE_TOKEN} contains angles in degrees for each {SERVO_TOKEN}
-@dataclass
-class Pose:
-    name: str # name of pose for llm use
-    angles: List[int] # list of int angles in degrees (0, 360)
-    desc: str # description of position for llm use
-{SERVO_TOKEN}: List[Servo] = [{"".join([str(s) for s in SERVOS])}]
-"""
-
-MOVE_MSG: str = f"""
-The user will describe in natural language a {MOVE_TOKEN} command.
-Format the command so that {ROBOT_TOKEN} can understand it.
-{ROBOT_TOKEN} can accept the following commands:
-{"".join([f"{pose.name}: {pose.desc}" for pose in POSES.values()])}
-Return the one-word string name of the best matching pose.
-"""
 
 # Convert servo units into degrees for readability
 # Max for units is 4095, which is 360 degrees

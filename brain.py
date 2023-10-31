@@ -4,13 +4,13 @@ import sys
 import subprocess
 import time
 import base64
+import uuid
 
-# from .utils import scrape_callback, send_file
+from .utils import scrape, send_file
 from hparams import HPARAMS
 import requests
-# from PIL import Image
 
-class MiniDocker:
+class VLMDocker:
 
     def __init__(self, name: str = 'llava13b', port: str = '5000', warmup: int = 25):
         self.nuke()
@@ -37,11 +37,8 @@ class MiniDocker:
         self.nuke()
 
 
-async def run_vlm(hparams: dict = HPARAMS):
-    prompt: str = hparams.get("vlm_prompt")
-    docker_url: str = hparams.get("vlm_docker_url")
-    image_path = os.path.join(hparams.get("brain_data_dir"), hparams.get("image_filename"))
-    with open(image_path, "rb") as img_file:
+async def run_vlm(prompt: str, docker_url: str, image_filepath: str):
+    with open(image_filepath, "rb") as img_file:
         response = requests.post(
             docker_url,
             headers={"Content-Type": "application/json"},
@@ -57,34 +54,45 @@ async def run_vlm(hparams: dict = HPARAMS):
 
 async def main_loop(hparams: dict = HPARAMS):
 
-    # # Generate a unique id for this generation session
-    # session_id = str(uuid.uuid4())[:6]
-
-    # # Create a output folder for the session id and use that as the output dir
-    # output_dir = os.path.join(brain_data_dir, session_id)
-    # os.makedirs(output_dir, exist_ok=True)
-
-
-    # scrape for image + image log
-
-    # scrape for servo + servo log
-
-    # results = await asyncio.gather(*_tasks, return_exceptions=True)
+    results = await asyncio.gather(
+        scrape(
+            hparams.get("robotlog_filename"),
+            hparams.get("brain_data_dir"),
+            hparams.get("scrape_interval"),
+            hparams.get("scrape_timeout"),
+        ),
+        scrape(
+            hparams.get("image_filename"),
+            hparams.get("brain_data_dir"),
+            hparams.get("scrape_interval"),
+            hparams.get("scrape_timeout"),
+        ),
+        return_exceptions=True,
+    )
 
     # # ask VLM for commands
-    vlm_results = await asyncio.gather(run_vlm(hparams), return_exceptions=True)
-    
-    # # write commands, send commands
+    vlm_results = await asyncio.gather(
+        run_vlm(
+            hparams.get("vlm_prompt"),
+            hparams.get("vlm_docker_url"),
+            os.path.join(hparams.get("brain_data_dir"), hparams.get("image_filename")),
+        ),
+    return_exceptions=True)
 
-    # results = await asyncio.gather(*_tasks, return_exceptions=True)
+    # write commands to file
 
-    pass
-
-async def test(hparams: dict = HPARAMS):
-
-    pass
-
+    # send commands to robot
+    results = await asyncio.gather(
+        send_file(
+            hparams.get("commands_filename"),
+            hparams.get("brain_data_dir"),
+            hparams.get("robot_data_dir"),
+            hparams.get("robot_username"),
+            hparams.get("robot_ip"),
+        ),
+        return_exceptions=True,
+    )
 
 if __name__ == "__main__":
-    docker = MiniDocker()
+    docker = VLMDocker()
     asyncio.run(main_loop())
