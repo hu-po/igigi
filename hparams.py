@@ -40,8 +40,8 @@ HPARAMS = {
     "robotlog_filename" : "igigi.robotlog.txt",
     "commands_filename" : "igigi.command.txt",
 
-    "duration" : "1",
-    "fps" : "30",
+    "video_duration" : "1",
+    "video_fps" : "30",
 }
 
 # # Generate a unique id for this generation session
