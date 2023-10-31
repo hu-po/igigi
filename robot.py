@@ -16,6 +16,12 @@ async def move_servos(
     temperature: int = 0.2,
     max_tokens: int = 32,
 ) -> str:
+    print(f"Moving servos with {user_prompt}")
+    # Add actions to the system prompt
+    for pose in servos.poses:
+        system_prompt += f"{pose.name} : {pose.desc}\n"
+    for move in servos.moves:
+        system_prompt += f"{move.name} : {move.desc}\n"
     response = openai.ChatCompletion.create(
         messages=[
             {"role": "system", "content": system_prompt},
@@ -31,6 +37,7 @@ async def move_servos(
 
 
 async def main_loop(servos: Servos, hparams: dict = HPARAMS):
+    print("Starting main loop")
     results = await asyncio.gather(
         scrape(
             hparams.get("commands_filename"),
@@ -56,11 +63,11 @@ async def main_loop(servos: Servos, hparams: dict = HPARAMS):
         ),
         move_servos(
             servos,
-            hparams.get("llm_system_prompt"),
-            hparams.get("llm_move_prompt"),
-            hparams.get("llm_model"),
-            hparams.get("llm_temperature"),
-            hparams.get("llm_max_tokens"),
+            hparams.get("robot_llm_system_prompt"),
+            "go to home position",
+            hparams.get("robot_llm_model"),
+            hparams.get("robot_llm_temperature"),
+            hparams.get("robot_llm_max_tokens"),
         ),
         record_video(
             CAMERAS["stereo"],

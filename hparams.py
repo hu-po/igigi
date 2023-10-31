@@ -8,8 +8,10 @@ HPARAMS = {
     "vlm_prompt" : "Is there a person in this image? Where are they? On the left? right? center?",
     "vlm_docker_url" : "http://localhost:5000/predictions",
 
-    "llm_system_prompt" : "You are an llm control unit for a robot arm.",
-    "llm_move_prompt" : "The user will describe in natural language a command. Choose one of the following choices based on the command. Return only the integer id of the choice.",
+    "robot_llm_system_prompt" : "The user will describe in natural language a desired action. Choose one of the following actions based on the command. Return only the name of the action. Here are the available actions: \n",
+    "robot_llm_model": "gpt-3.5-turbo",
+    "robot_llm_temperature" : 0.2,
+    "robot_llm_max_tokens" : 32,
 
     # The brain is a linux machine with a GPU that runs the VLM
     "brain_data_dir" : "/home/oop/dev/data/",

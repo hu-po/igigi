@@ -8,6 +8,7 @@ async def scrape(
     interval: float,
     timeout: int,
 ):
+    print(f"Scraping {filename} from {directory} every {interval} seconds.")
     try:
 
         async def _scrape():
@@ -35,13 +36,12 @@ async def send_file(
 ) -> None:
     local_path = os.path.join(local_dir_path, filename)
     remote_path = os.path.join(remote_dir_path, filename)
+    print(f"Sending {local_path} to {remote_path}\n")
     cmd = ["scp", local_path, f"{remote_username}@{remote_ip}:{remote_path}"]
-    print(f"Running command: {cmd}")
     process = await asyncio.create_subprocess_exec(
         *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
     stdout, stderr = await process.communicate()
-    print(f"Sent {local_path} to {remote_path}\n")
 
 
 async def write_log(

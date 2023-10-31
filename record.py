@@ -36,6 +36,7 @@ async def record_video(
     duration: int = 1,
     fps: int = 30,
 ) -> None:
+    print(f"Recording video with {camera.name}")
     output_path = os.path.join(output_dir, filename),
     log: str = ""
     cmd = [
@@ -65,6 +66,7 @@ async def take_image(
     filename: str = "test.png",
     output_dir: str = os.environ["DATA_DIR"],
 ) -> None:
+    print(f"Taking image with {camera.name}")
     output_path: str = os.path.join(output_dir, filename)
     log: str = ""
     cmd = [
