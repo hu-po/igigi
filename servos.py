@@ -86,7 +86,7 @@ class Servos:
         torque_enable: int = 1,
         torque_disable: int = 0,
     ):
-        self.servos = servos.values()
+        self.servos: List[Servo] = list(servos.values()) # List of Servo objects to control
         for servo in self.servos:
             log.debug("---- Initialize servo ----")
             log.debug(f"servo: {servo.name}")
@@ -131,25 +131,25 @@ class Servos:
         # Check to see if action is one of the static poses
         desired_pose = self.poses.get(action, None)
         if desired_pose is not None:
-            move_log += f"Action is moving to static position {desired_pose}"
-            goal_positions = desired_pose.angles
+            move_log += f"Action is moving to static position {desired_pose.name}"
+            goal_position = desired_pose.angles
         else:
             # Check to see if action is one of the moves
             desired_move = self.moves.get(action, None)
             if desired_move is not None:
-                move_log += f"Action is moving {desired_move}"
-                goal_positions = [sum(x) for x in zip(self._read_pos(), desired_move.vector)]
+                move_log += f"Action is moving {desired_move.name}"
+                goal_position = [sum(x) for x in zip(self._read_pos(), desired_move.vector)]
             else:
                 move_log += f"ERROR: Could not find a match for desired action {action}.\n"
                 return move_log
-        move_log += f"Servos commanded to {goal_positions}."
+        move_log += f"Servos commanded to {goal_position}."
         try:
             while True:
                 elapsed_time = time.time() - start_time
-                self._write_position(goal_positions)
+                self._write_position(goal_position)
                 true_positions = self._read_pos()
                 move_log += f"Servos at position {true_positions}."
-                if epsilon > sum(abs(true_positions[i] - goal_positions[i]) for i in range(len(goal_positions))):
+                if epsilon > sum(abs(true_positions[i] - goal_position[i]) for i in range(len(goal_position))):
                     move_log += f"Action succeeded in {elapsed_time} seconds.\n"
                     break
                 if elapsed_time > timeout.total_seconds():
