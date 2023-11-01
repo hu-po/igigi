@@ -31,7 +31,7 @@ async def main_loop(servos: Servos, ui: ChromeUI):
     robot_log += results[0]["log"]
     if results[0].get("full_path", None) is None:
         robot_log += "No command file found."
-    elif results[0]["file_age"] < HPARAMS["commands_max_age"]:
+    elif results[0]["file_age"] > HPARAMS["commands_max_age"]:
         robot_log += "Command file is too old."
     else:
         robot_log += "Adding move_servos to tasks."
