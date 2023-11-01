@@ -1,106 +1,113 @@
 import asyncio
-import subprocess
-import os
-import openai
 
 from hparams import HPARAMS
 from utils import find_file, send_file
 from record import take_image, record_video, CAMERAS
+from llm import move_servos
 from servos import Servos
 from app import ChromeUI
 
-async def move_servos(
-    servos: Servos,
-    system_prompt: str,
-    user_prompt: str,
-    model: str = "gpt-3.5-turbo",
-    temperature: int = 0.2,
-    max_tokens: int = 32,
-) -> str:
-    print(f"Moving servos with {user_prompt}")
-    # Add actions to the system prompt
-    for pose in servos.poses.values():
-        system_prompt += f"{pose.name} : {pose.desc}\n"
-    for move in servos.moves.values():
-        system_prompt += f"{move.name} : {move.desc}\n"
-    response = openai.ChatCompletion.create(
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-        model=model,
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-    reply: str = response.choices[0].message.content
-    servolog = servos.move(reply)
-    return servolog
 
-
-async def main_loop(servos: Servos, ui: ChromeUI, hparams: dict = HPARAMS):
-    print("Starting main loop")
-    print("Batch 1 of tasks")
-    results = await asyncio.gather(
+async def main_loop(servos: Servos, ui: ChromeUI):
+    robot_log: str = ""
+    # Batch 1: get commands, take mono image
+    task_batch = [
         find_file(
-            hparams.get("commands_filename"),
-            hparams.get("robot_data_dir"),
-            hparams.get("scrape_interval"),
-            hparams.get("scrape_timeout"),
+            HPARAMS["commands_filename"],
+            HPARAMS["robot_data_dir"],
+            HPARAMS["scrape_interval"],
+            HPARAMS["scrape_timeout"],
         ),
         take_image(
-            CAMERAS["stereo"],
-            hparams.get("image_filename"),
-            hparams.get("robot_data_dir"),
+            CAMERAS["mono"],
+            HPARAMS["image_filename"],
+            HPARAMS["robot_data_dir"],
         ),
-        return_exceptions=True,
-    )
-    print(results)
-    print("Batch 2 of tasks")
-    results = await asyncio.gather(
-        send_file(
-            hparams.get("image_filename"),
-            hparams.get("robot_data_dir"),
-            hparams.get("brain_data_dir"),
-            hparams.get("brain_username"),
-            hparams.get("brain_ip"),
-        ),
-        move_servos(
-            servos,
-            hparams.get("robot_llm_system_prompt"),
-            "go to home position",
-            hparams.get("robot_llm_model"),
-            hparams.get("robot_llm_temperature"),
-            hparams.get("robot_llm_max_tokens"),
-        ),
+    ]
+    results = await asyncio.gather(*task_batch, return_exceptions=True)
+    # Create new task batch
+    task_batch = []
+    # Moving servos requires a commands file
+    robot_log += results[0]["log"]
+    will_move_servos: bool = True
+    if results[0]["full_path"] is None:
+       robot_log += "No command file found."
+       will_move_servos = False
+    if results[0]["file_age"] < HPARAMS["commands_max_age"]:
+        robot_log += "Command file is too old."
+        will_move_servos = False
+    if will_move_servos:
+        robot_log += "Adding move_servos to tasks."
+        task_batch.append(
+            move_servos(
+                servos,
+                HPARAMS["robot_llm_system_prompt"],
+                HPARAMS["commands_filename"],
+                HPARAMS["robot_llm_model"],
+                HPARAMS["robot_llm_temperature"],
+                HPARAMS["robot_llm_max_tokens"],
+            ),
+        )
+    # Sending image requires an error free image capture
+    robot_log += results[1]["log"]
+    if results[1].get("output_path") is not None:
+        robot_log += "Adding send_file to tasks."
+        task_batch.append(
+            send_file(
+                HPARAMS["image_filename"],
+                HPARAMS["robot_data_dir"],
+                HPARAMS["brain_data_dir"],
+                HPARAMS["brain_username"],
+                HPARAMS["brain_ip"],
+            ),
+        )
+    # Batch 2: send mono image, move servos, record stereo video
+    robot_log += "Adding record_video to tasks."
+    task_batch.append(
         record_video(
             CAMERAS["stereo"],
-            hparams.get("video_filename"),
-            hparams.get("robot_data_dir"),
-            hparams.get("video_duration"),
-            hparams.get("video_fps"),
+            HPARAMS["video_filename"],
+            HPARAMS["robot_data_dir"],
+            HPARAMS["video_duration"],
+            HPARAMS["video_fps"],
         ),
-        return_exceptions=True,
     )
-    print(results)
-    print("Batch 3 of tasks")
-    results = await asyncio.gather(
+    results = await asyncio.gather(*task_batch, return_exceptions=True)
+    # Create new task batch
+    task_batch = []
+    # Sending video requires an error free capture
+    robot_log += results[-1]["log"]
+    if results[-1].get("output_path") is not None:
+        robot_log += "Adding send_file to tasks."
+        task_batch.append(
         send_file(
-            hparams.get("robotlog_filename"),
-            hparams.get("robot_data_dir"),
-            hparams.get("brain_data_dir"),
-            hparams.get("brain_username"),
-            hparams.get("brain_ip"),
+            HPARAMS["video_filename"],
+            HPARAMS["robot_data_dir"],
+            HPARAMS["brain_data_dir"],
+            HPARAMS["brain_username"],
+            HPARAMS["brain_ip"],
         ),
+        )
+    # Add any other results to robot log
+    for result in results[:-1]:
+        robot_log += result["log"]
+    # Write robot log to file
+    with open(HPARAMS["robotlog_filename"], "w") as f:
+        f.write(robot_log)
+    # Batch 3: send robot log, send stereo video, update ui
+    task_batch.append(
         send_file(
-            hparams.get("video_filename"),
-            hparams.get("robot_data_dir"),
-            hparams.get("brain_data_dir"),
-            hparams.get("brain_username"),
-            hparams.get("brain_ip"),
-        ),
+            HPARAMS["robotlog_filename"],
+            HPARAMS["robot_data_dir"],
+            HPARAMS["brain_data_dir"],
+            HPARAMS["brain_username"],
+            HPARAMS["brain_ip"],
+        )
+    )
+    task_batch.append(
         ui.update_interface(),
-        return_exceptions=True,
     )
+    results = await asyncio.gather(*task_batch, return_exceptions=True)
 
 
 if __name__ == "__main__":

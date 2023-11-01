@@ -14,47 +14,45 @@ async def main_loop(hparams: dict = HPARAMS):
     the functions are
 
     the history is
-
     """
-    print("Starting main loop")
-    print("Batch 1 of tasks")
-    results = await asyncio.gather(
+    # Batch 1: get robot log, get mono image
+    task_batch = [
         find_file(
-            hparams.get("robotlog_filename"),
-            hparams.get("brain_data_dir"),
-            hparams.get("scrape_interval"),
-            hparams.get("scrape_timeout"),
+            HPARAMS["robotlog_filename"],
+            HPARAMS["brain_data_dir"],
+            HPARAMS["scrape_interval"],
+            HPARAMS["scrape_timeout"],
         ),
         find_file(
-            hparams.get("image_filename"),
-            hparams.get("brain_data_dir"),
-            hparams.get("scrape_interval"),
-            hparams.get("scrape_timeout"),
+            HPARAMS["image_filename"],
+            HPARAMS["brain_data_dir"],
+            HPARAMS["scrape_interval"],
+            HPARAMS["scrape_timeout"],
         ),
-        return_exceptions=True,
-    )
-    print(results)
-    print("Batch 2 of tasks")
-    results = await asyncio.gather(
+    ]
+    results = await asyncio.gather(*task_batch, return_exceptions=True)
+
+    # Batch 2: run vlm
+    task_batch = [
         run_vlm(
-            hparams.get("vlm_prompt"),
-            hparams.get("vlm_docker_url"),
-            os.path.join(hparams.get("brain_data_dir"), hparams.get("image_filename")),
+            HPARAMS["vlm_prompt"],
+            HPARAMS["vlm_docker_url"],
+            os.path.join(HPARAMS["brain_data_dir"], HPARAMS["image_filename"]),
         ),
-        return_exceptions=True,
-    )
-    print(results)
-    print("Batch 3 of tasks")
-    results = await asyncio.gather(
+    ]
+    results = await asyncio.gather(*task_batch, return_exceptions=True)
+
+    # Batch 3: send commands
+    task_batch = [
         send_file(
-            hparams.get("commands_filename"),
-            hparams.get("brain_data_dir"),
-            hparams.get("robot_data_dir"),
-            hparams.get("robot_username"),
-            hparams.get("robot_ip"),
+            HPARAMS["commands_filename"],
+            HPARAMS["brain_data_dir"],
+            HPARAMS["robot_data_dir"],
+            HPARAMS["robot_username"],
+            HPARAMS["robot_ip"],
         ),
-        return_exceptions=True,
-    )
+    ]
+    results = await asyncio.gather(*task_batch, return_exceptions=True)
 
 
 if __name__ == "__main__":

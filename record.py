@@ -105,7 +105,6 @@ async def take_image(
     if process.returncode != 0:
         return {
             "log": f"Error on image capture: {stderr.decode()}",
-            "output_path": output_path,
         }
     else:
         return {

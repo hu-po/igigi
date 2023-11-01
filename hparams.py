@@ -39,17 +39,17 @@ HPARAMS = {
     "video_filename" : "igigi.video.mp4",
     "robotlog_filename" : "igigi.robotlog.txt",
     "commands_filename" : "igigi.command.txt",
-
+    
     "video_duration" : "1",
     "video_fps" : "30",
 
-
-    "timeout_find_file" : 2, # seconds to wait before giving up on finding a file
-    "timeout_send_file" : 2, # seconds to wait before giving up on sending a file
-    "timeout_record_video" : 2, # seconds to wait before giving up on recording a video
-    "timeout_take_image" : 2, # seconds to wait before giving up on taking an image
-    "timeout_move_servos" : 2, # seconds to wait before giving up on moving servos
-    "timeout_run_vlm" : 2, # seconds to wait before giving up on running the VLM
+    # Async functions all have timeouts in seconds
+    "timeout_find_file" : 2,
+    "timeout_send_file" : 2,
+    "timeout_record_video" : 2,
+    "timeout_take_image" : 2,
+    "timeout_move_servos" : 2,
+    "timeout_run_vlm" : 2,
 }
 
 # # Generate a unique id for this generation session

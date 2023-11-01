@@ -11,6 +11,7 @@ def async_timeout(timeout: int):
         async def wrapper(*args: Any, **kwargs: Any) -> Dict[str, Any]:
             try:
                 log: str = f"Calling {func.__name__}."
+                print(log)
                 results = await asyncio.wait_for(func(*args, **kwargs), timeout=timeout)
                 assert "log" in results.keys(), "Could not find log in {func.__name__}"
                 return {"log": log + results["log"], **results}
