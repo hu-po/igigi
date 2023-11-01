@@ -89,7 +89,8 @@ async def main_loop(servos: Servos, ui: ChromeUI):
     for result in results[:-1]:
         robot_log += result["log"]
     # Write robot log to file
-    with open(HPARAMS["robotlog_filename"], "w") as f:
+    output_path = os.path.join(HPARAMS["robot_data_dir"], HPARAMS["session_name"], HPARAMS["robotlog_filename"])
+    with open(output_path, "w") as f:
         f.write(robot_log)
     # Batch 3: send robot log, send stereo video, update ui
     task_batch.append(
