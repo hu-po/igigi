@@ -53,7 +53,7 @@ async def main_loop() -> Dict[str, Any]:
         log += result["log"]
     task_batch = []
     commands = results[0].get("reply", None)
-    print(f"Commands: {commands}")
+    print(f"VLM says: {commands}")
     if commands is None:
         log += "No commands from VLM."
     else:

@@ -30,6 +30,7 @@ async def move_servos(
         max_tokens=max_tokens,
     )
     reply: str = response.choices[0].message.content
+    print(f"LLM says: {reply}")
     servolog = servos.move(
         reply,
         speed=HPARAMS["move_servo_speed"],
