@@ -39,6 +39,16 @@ GPT-4 via API (OpenAI)
 
 VR visualization is done via WebXR and a Quest Pro
 
+### Viewing Cameras
+
+```
+ssh -L 12345:localhost:12345 pi@192.168.1.10
+ffmpeg -f v4l2 -framerate 30 -video_size 1280x480 -i /dev/video0 -c:v libx264 -preset ultrafast -tune zerolatency -f mpegts tcp://0.0.0.0:12345?listen
+ffmpeg -f v4l2 -framerate 30 -video_size 320x240 -i /dev/video2 -c:v libx264 -preset ultrafast -tune zerolatency -f mpegts tcp://0.0.0.0:12345?listen
+
+ffplay tcp://localhost:12345
+```
+
 ### Notes
 
 All nodes must be communicating via local network, set up ssh keys for passwordless login.

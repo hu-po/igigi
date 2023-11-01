@@ -22,14 +22,14 @@ CAMERAS: Dict[str, Camera] = {
         name="stereo",
         width=1280,
         height=480,
-        desc="stereo camera on the face facing forward",
+        desc="stereo camera facing forward",
     ),
     "mono": Camera(
         device="/dev/video2",
         name="mono",
         width=640,
         height=480,
-        desc="monocular camera on the chest facing forward",
+        desc="monocular camera facing forward",
     ),
 }
 
