@@ -109,11 +109,14 @@ async def main_loop(servos: Servos, ui: ChromeUI):
 
 if __name__ == "__main__":
     HPARAMS["session_name"] = create_session_folder(HPARAMS["robot_data_dir"])
+    # Robot is a singleton, requires state, start it in home position
     servos = Servos()
+    servos.move("home")
     ui = ChromeUI(
         os.path.join(HPARAMS["robot_data_dir"], HPARAMS["session_name"]),
         HPARAMS.get("video_filename"),
         HPARAMS.get("image_filename"),
         HPARAMS.get("robotlog_filename"),
     )
-    asyncio.run(main_loop(servos, ui))
+    while True:
+        asyncio.run(main_loop(servos, ui))
