@@ -27,7 +27,7 @@ class ChromeUI:
 
         # self.update_interface()
 
-    def update_interface(self):
+    async def update_interface(self):
         pass
         # with gr.Blocks() as demo:
         #     gr.Markdown("# IGIGI")
