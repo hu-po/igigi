@@ -4,7 +4,7 @@ import os
 import openai
 
 from hparams import HPARAMS
-from utils import scrape, send_file
+from utils import find_file, send_file
 from record import take_image, record_video, CAMERAS
 from servos import Servos
 from app import ChromeUI
@@ -41,7 +41,7 @@ async def main_loop(servos: Servos, ui: ChromeUI, hparams: dict = HPARAMS):
     print("Starting main loop")
     print("Batch 1 of tasks")
     results = await asyncio.gather(
-        scrape(
+        find_file(
             hparams.get("commands_filename"),
             hparams.get("robot_data_dir"),
             hparams.get("scrape_interval"),

@@ -5,7 +5,7 @@ import time
 import base64
 
 from hparams import HPARAMS
-from utils import scrape, send_file
+from utils import find_file, send_file
 import requests
 
 class VLMDocker:
@@ -58,23 +58,26 @@ async def main_loop(hparams: dict = HPARAMS):
         the functions are
         
         the history is
-        
+
     """
+    print("Starting main loop")
+    print("Batch 1 of tasks")
     results = await asyncio.gather(
-        scrape(
+        find_file(
             hparams.get("robotlog_filename"),
             hparams.get("brain_data_dir"),
             hparams.get("scrape_interval"),
             hparams.get("scrape_timeout"),
         ),
-        scrape(
+        find_file(
             hparams.get("image_filename"),
             hparams.get("brain_data_dir"),
             hparams.get("scrape_interval"),
             hparams.get("scrape_timeout"),
         ),
     return_exceptions=True)
-
+    print(results)
+    print("Batch 2 of tasks")
     results = await asyncio.gather(
         run_vlm(
             hparams.get("vlm_prompt"),
@@ -82,7 +85,8 @@ async def main_loop(hparams: dict = HPARAMS):
             os.path.join(hparams.get("brain_data_dir"), hparams.get("image_filename")),
         ),
     return_exceptions=True)
-
+    print(results)
+    print("Batch 3 of tasks")
     results = await asyncio.gather(
         send_file(
             hparams.get("commands_filename"),
