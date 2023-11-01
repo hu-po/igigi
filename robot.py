@@ -1,6 +1,7 @@
 import asyncio
 import os
 from typing import Any, Dict
+import time
 
 from hparams import HPARAMS
 from utils import find_file, send_file, create_session_folder, async_timeout
@@ -27,7 +28,10 @@ async def main_loop(servos: Servos, ui: ChromeUI) -> Dict[str, Any]:
             os.path.join(HPARAMS["robot_data_dir"], HPARAMS["session_name"]),
         ),
     ]
+    print(f"Run task_batch 1, {len(task_batch)} tasks.")
+    start_time = time.time()
     results = await asyncio.gather(*task_batch, return_exceptions=True)
+    print(f"task_batch 1 took {time.time() - start_time} seconds.")
     for result in results:
         log += result["log"]
     task_batch = []
@@ -74,7 +78,10 @@ async def main_loop(servos: Servos, ui: ChromeUI) -> Dict[str, Any]:
             HPARAMS["video_fps"],
         ),
     )
+    print(f"Run task_batch 2, {len(task_batch)} tasks.")
+    start_time = time.time()
     results = await asyncio.gather(*task_batch, return_exceptions=True)
+    print(f"task_batch 2 took {time.time() - start_time} seconds.")
     for result in results:
         log += result["log"]
     task_batch = []
@@ -103,7 +110,10 @@ async def main_loop(servos: Servos, ui: ChromeUI) -> Dict[str, Any]:
     task_batch.append(
         ui.update_interface(),
     )
+    print(f"Run task_batch 3, {len(task_batch)} tasks.")
+    start_time = time.time()
     results = await asyncio.gather(*task_batch, return_exceptions=True)
+    print(f"task_batch 3 took {time.time() - start_time} seconds.")
     for result in results:
         log += result["log"]
     return {"log": log}
