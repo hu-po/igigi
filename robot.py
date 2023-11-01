@@ -29,14 +29,11 @@ async def main_loop(servos: Servos, ui: ChromeUI):
     task_batch = []
     # Moving servos requires a commands file
     robot_log += results[0]["log"]
-    will_move_servos: bool = True
-    if results[0]["full_path"] is None:
+    if results[0].get("full_path", None) is None:
         robot_log += "No command file found."
-        will_move_servos = False
-    if results[0]["file_age"] < HPARAMS["commands_max_age"]:
+    elif results[0]["file_age"] < HPARAMS["commands_max_age"]:
         robot_log += "Command file is too old."
-        will_move_servos = False
-    if will_move_servos:
+    else:
         robot_log += "Adding move_servos to tasks."
         task_batch.append(
             move_servos(
