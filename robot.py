@@ -20,7 +20,7 @@ async def main_loop(servos: Servos, ui: ChromeUI):
             HPARAMS["scrape_timeout"],
         ),
         take_image(
-            CAMERAS["mono"],
+            CAMERAS["stereo"],
             HPARAMS["image_filename"],
             os.path.join(HPARAMS["robot_data_dir"], HPARAMS["session_name"]),
         ),
@@ -114,5 +114,10 @@ async def main_loop(servos: Servos, ui: ChromeUI):
 if __name__ == "__main__":
     HPARAMS["session_name"] = create_session_folder(HPARAMS["robot_data_dir"])
     servos = Servos()
-    ui = ChromeUI()
+    ui = ChromeUI(
+        os.path.join(HPARAMS["robot_data_dir"], HPARAMS["session_name"]),
+        HPARAMS.get("video_filename"),
+        HPARAMS.get("image_filename"),
+        HPARAMS.get("robotlog_filename"),
+    )
     asyncio.run(main_loop(servos, ui))
