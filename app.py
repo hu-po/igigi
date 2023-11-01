@@ -28,15 +28,16 @@ class ChromeUI:
         # self.update_interface()
 
     def update_interface(self):
-        with gr.Blocks() as demo:
-            gr.Markdown("# IGIGI")
-            with gr.Column():
-                gr.Video(self.video_path, label="Video")
-                gr.Image(self.image_path, label="Image")
-                with open(self.text_path, "r") as f:
-                    text = f.read()
-                gr.Textbox(text, label="Text")
-        demo.launch()
+        pass
+        # with gr.Blocks() as demo:
+        #     gr.Markdown("# IGIGI")
+        #     with gr.Column():
+        #         gr.Video(self.video_path, label="Video")
+        #         gr.Image(self.image_path, label="Image")
+        #         with open(self.text_path, "r") as f:
+        #             text = f.read()
+        #         gr.Textbox(text, label="Text")
+        # demo.launch()
 
     def __del__(self):
         self.proc.terminate()
