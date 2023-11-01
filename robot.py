@@ -6,7 +6,7 @@ import time
 from hparams import HPARAMS
 from utils import find_file, send_file, create_session_folder, async_timeout
 from record import take_image, record_video, CAMERAS
-from llm import move_servos
+from llm import run_llm
 from servos import Servos
 from app import ChromeUI
 
@@ -36,6 +36,11 @@ async def main_loop(servos: Servos, ui: ChromeUI) -> Dict[str, Any]:
         log += result["log"]
     task_batch = []
     # Moving servos requires a commands file
+    # Once there is a command file then you can create an llm job
+    # The crafting of the llm command prompt and checking whether
+    # the llm job runs on batch 2, the move runs on batch 1 if the file is found
+    # its more about creating this type of task queue where snakes of tasks
+    # can be added. Like a chain of tasks. (for the next X moves do this chain of tasks, if there are issues, re-put the task on the queue, if a certain amount of fails exceed then you can stop)
     if results[0].get("full_path", None) is None:
         log += "No command file found."
     elif results[0]["file_age"] > HPARAMS["commands_max_age"]:
@@ -46,7 +51,7 @@ async def main_loop(servos: Servos, ui: ChromeUI) -> Dict[str, Any]:
             commands = f.read()
         print(f"Commands: {commands}")
         task_batch.append(
-            move_servos(
+            run_llm(
                 servos,
                 HPARAMS["robot_llm_system_prompt"],
                 commands,
