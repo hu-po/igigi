@@ -11,7 +11,7 @@ from servos import Servos
 async def move_servos(
     servos: Servos,
     system_prompt: str,
-    commands_filename: str = HPARAMS["commands_filename"],
+    commands: str,
     model: str = HPARAMS["robot_llm_model"],
     temperature: int = HPARAMS["robot_llm_temperature"],
     max_tokens: int = HPARAMS["robot_llm_max_tokens"],
@@ -20,12 +20,10 @@ async def move_servos(
         system_prompt += f"{pose.name} : static pose, {pose.desc}\n"
     for move in servos.moves.values():
         system_prompt += f"{move.name} : movement, {move.desc}\n"
-    with open(commands_filename, "r") as f:
-        user_prompt = f.read()
     response = openai.ChatCompletion.create(
         messages=[
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
+            {"role": "user", "content": commands},
         ],
         model=model,
         temperature=temperature,

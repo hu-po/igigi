@@ -35,11 +35,14 @@ async def main_loop(servos: Servos, ui: ChromeUI):
         robot_log += "Command file is too old."
     else:
         robot_log += "Adding move_servos to tasks."
+        with open(results[0]["full_path"], "r") as f:
+            commands = f.read()
+        print(f"Commands: {commands}")
         task_batch.append(
             move_servos(
                 servos,
                 HPARAMS["robot_llm_system_prompt"],
-                HPARAMS["commands_filename"],
+                commands,
                 HPARAMS["robot_llm_model"],
                 HPARAMS["robot_llm_temperature"],
                 HPARAMS["robot_llm_max_tokens"],
