@@ -39,11 +39,11 @@ class Pose:
     desc: str # description of static pose for llm use
 
 POSES: Dict[str, Pose] = {
-    "home" : Pose("home", [180, 211, 180], "home/reset position, or looking up to the sky"),
-    "forward" : Pose("forward", [180, 140, 180], "looking ahead, facing forward"),
-    "face_left" : Pose("face_left", [215, 130, 151], "looking all the way to the left"),
-    "face_right" : Pose("face_right", [145, 130, 209], "looking all the way to the right"),
-    "face_down": Pose("face_down", [180, 94, 180], "looking down at the ground, facing forward")
+    "home" : Pose("home", [180, 225, 180], "home/reset position, or looking up to the sky"),
+    "forward" : Pose("forward", [180, 180, 180], "looking ahead, facing forward"),
+    "face_left" : Pose("face_left", [180, 180, 270], "looking all the way to the left"),
+    "face_right" : Pose("face_right", [180, 180, 90], "looking all the way to the right"),
+    "face_down": Pose("face_down", [180, 90, 180], "looking down at the ground, facing forward")
 }
 
 @dataclass
@@ -52,12 +52,13 @@ class Move:
     vector: List[int] # movement vector in degrees (0, 360) one for each servo
     desc: str # description of position for llm use
 
-VELOCITY: int = 10 # degrees per move
 MOVES: Dict[str, Move] = {
-    "up" : Move("up", [0, VELOCITY, 0], "look more upwards, move slightly up"),
-    "down" : Move("down", [0, -VELOCITY, 0], "look more downwards, move slightly down"),
-    "left" : Move("left", [0, 0, -VELOCITY], "look more to the left, move slightly left"),
-    "right" : Move("right", [0, 0, VELOCITY], "look more to the right, move slightly right"),
+    "up" : Move("up", [0, -1, 0], "look more upwards, move slightly up"),
+    "down" : Move("down", [0, 1, 0], "look more downwards, move slightly down"),
+    "left" : Move("left", [0, 0, 1], "look more to the left, move slightly left"),
+    "right" : Move("right", [0, 0, -1], "look more to the right, move slightly right"),
+    "tilt_left" : Move("tilt_left", [-1, 0, 0], "roll or tilt head to the left"),
+    "tilt_right" : Move("tilt_right", [1, 0, 0], "roll or tilt head to the right"),
 }
 
 # Convert servo units into degrees for readability
@@ -123,6 +124,7 @@ class Servos:
         self,
         action: str,
         epsilon: int = 3, # degrees
+        speed: int = 4, # degrees per move
         timeout: int = 1, # timeout for a move in seconds
         interval: float = 0.1, # interval between position reads in seconds
     ) -> str:
@@ -139,7 +141,10 @@ class Servos:
             desired_move = self.moves.get(action, None)
             if desired_move is not None:
                 move_log += f"Action is moving {desired_move.name}"
-                goal_position = [sum(x) for x in zip(self._read_pos(), desired_move.vector)]
+                move_vector = [x * speed for x in desired_move.vector]
+                move_log += f"Move vector is {move_vector}."
+                true_position = self._read_pos()
+                goal_position = [move_vector[i] + true_position[i] for i in range(len(move_vector))]
             else:
                 move_log += f"ERROR: Could not find a match for desired action {action}.\n"
                 return move_log
@@ -248,6 +253,7 @@ def test_servos() -> None:
     servos = Servos()
     for pose in servos.poses.values():
         print(servos.move(pose.name))
+        time.sleep(1)
     servos.move("home")
     for move in servos.moves.values():
         print(servos.move(move.name))
@@ -263,4 +269,4 @@ def limp_mode() -> None:
 
 if __name__ == "__main__":
     test_servos()
-    limp_mode()
+    # limp_mode()

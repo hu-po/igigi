@@ -114,13 +114,12 @@ async def take_image(
 
 
 async def test_cameras():
-    print(f"Testing cameras: {CAMERAS}")
-    print("Testing take_image")
-    image_tasks = [take_image(camera) for camera in CAMERAS.values()]
-    _ = await asyncio.gather(*image_tasks, return_exceptions=True)
-    print("Testing record_video")
-    video_tasks = [record_video(camera) for camera in CAMERAS.values()]
-    _ = await asyncio.gather(*video_tasks, return_exceptions=True)
+    for name, camera in CAMERAS.items():
+        print(f"Testing camera {name}")
+        result = await take_image(camera)
+        print(result)
+        result = await record_video(camera)
+        print(result)
 
 
 if __name__ == "__main__":

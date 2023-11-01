@@ -34,6 +34,7 @@ async def move_servos(
     reply: str = response.choices[0].message.content
     servolog = servos.move(
         reply,
+        speed=HPARAMS["move_servo_speed"],
         epsilon=HPARAMS["move_epsilon_degrees"],
         timeout=HPARAMS["move_timeout_seconds"],
         interval=HPARAMS["move_interval_seconds"],

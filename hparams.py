@@ -29,6 +29,7 @@ HPARAMS = {
     "move_epsilon_degrees": 10,
     "move_timeout_seconds": 0.8,
     "move_interval_seconds": 0.01,
+    "move_servo_speed": 5, # degrees per move action
     "seed" : 42,
     "folder_stem" : "igigi",
     "date_format" : "%d.%m.%Y",
