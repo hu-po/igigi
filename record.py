@@ -1,7 +1,11 @@
 import asyncio
 import os
-from typing import Dict
+from typing import Any, Dict
 from dataclasses import dataclass
+
+from hparams import HPARAMS
+from utils import async_timeout
+
 
 @dataclass
 class Camera:
@@ -13,14 +17,14 @@ class Camera:
 
 
 CAMERAS: Dict[str, Camera] = {
-    "stereo" : Camera(
+    "stereo": Camera(
         device="/dev/video0",
         name="stereo",
         width=1280,
         height=480,
         desc="stereo camera on the face facing forward",
     ),
-    "mono" : Camera(
+    "mono": Camera(
         device="/dev/video2",
         name="mono",
         width=640,
@@ -29,64 +33,85 @@ CAMERAS: Dict[str, Camera] = {
     ),
 }
 
+
+@async_timeout(timeout=HPARAMS["timeout_record_video"])
 async def record_video(
     camera: Camera,
     filename: str = "test.mp4",
     output_dir: str = os.environ["DATA_DIR"],
-    duration: int = 1,
-    fps: int = 30,
-) -> None:
-    print(f"Recording video with {camera.name}")
-    output_path = os.path.join(output_dir, filename)
-    log: str = ""
-    cmd = [
-        "ffmpeg", "-y",
-        "-f", "v4l2",
-        "-r", str(fps),
-        "-t", str(duration),
-        "-video_size", f"{camera.width}x{camera.height}",
-        "-i", camera.device,
-        "-c:v", "h264",
-        output_path
-    ]
-    log += f"Recording video using {cmd}"
+    duration: int = HPARAMS["video_duration"],
+    fps: int = HPARAMS["video_fps"],
+) -> Dict[str, Any]:
+    output_path: str = os.path.join(output_dir, filename)
     process = await asyncio.create_subprocess_exec(
-        *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        *[
+            "ffmpeg",
+            "-y",
+            "-f",
+            "v4l2",
+            "-r",
+            str(fps),
+            "-t",
+            str(duration),
+            "-video_size",
+            f"{camera.width}x{camera.height}",
+            "-i",
+            camera.device,
+            "-c:v",
+            "h264",
+            output_path,
+        ],
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
     )
-    stdout, stderr = await process.communicate()
+    _, stderr = await process.communicate()
     if process.returncode != 0:
-        log += f"ERROR on record: {stderr.decode()}"
+        return {
+            "log": f"Error on video capture: {stderr.decode()}",
+            "output_path": output_path,
+        }
     else:
-        log += "Sucessfully recorded video."
-    return log
+        return {
+            "log": f"Video from {camera.name} saved to {filename}. Duration: {duration} seconds. Size {camera.width}x{camera.height} at {fps} fps.",
+            "output_path": output_path,
+        }
 
 
+@async_timeout(timeout=HPARAMS["timeout_take_image"])
 async def take_image(
     camera: Camera,
-    filename: str = "test.png",
-    output_dir: str = os.environ["DATA_DIR"],
-) -> None:
-    print(f"Taking image with {camera.name}")
+    filename: str = HPARAMS["image_filename"],
+    output_dir: str = HPARAMS["robot_data_dir"],
+) -> Dict[str, Any]:
     output_path: str = os.path.join(output_dir, filename)
-    log: str = ""
-    cmd = [
-        "ffmpeg", "-y",
-        "-f", "v4l2",
-        "-video_size", f"{camera.width}x{camera.height}",
-        "-i", camera.device,
-        "-vframes", "1",
-        output_path
-    ]
-    log += "Taking image using " + " ".join(cmd)
     process = await asyncio.create_subprocess_exec(
-        *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        *[
+            "ffmpeg",
+            "-y",
+            "-f",
+            "v4l2",
+            "-video_size",
+            f"{camera.width}x{camera.height}",
+            "-i",
+            camera.device,
+            "-vframes",
+            "1",
+            output_path,
+        ],
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
     )
-    stdout, stderr = await process.communicate()
+    _, stderr = await process.communicate()
     if process.returncode != 0:
-        log += f"ERROR on image capture: {stderr.decode()}"
+        return {
+            "log": f"Error on image capture: {stderr.decode()}",
+            "output_path": output_path,
+        }
     else:
-        log += "Sucessfully took image."
-    return log
+        return {
+            "log": f"Image from {camera.name} saved to {filename}. Size {camera.width}x{camera.height}.",
+            "output_path": output_path,
+        }
 
 
 async def test_cameras():

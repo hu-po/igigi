@@ -42,6 +42,14 @@ HPARAMS = {
 
     "video_duration" : "1",
     "video_fps" : "30",
+
+
+    "timeout_find_file" : 2, # seconds to wait before giving up on finding a file
+    "timeout_send_file" : 2, # seconds to wait before giving up on sending a file
+    "timeout_record_video" : 2, # seconds to wait before giving up on recording a video
+    "timeout_take_image" : 2, # seconds to wait before giving up on taking an image
+    "timeout_move_servos" : 2, # seconds to wait before giving up on moving servos
+    "timeout_run_vlm" : 2, # seconds to wait before giving up on running the VLM
 }
 
 # # Generate a unique id for this generation session
