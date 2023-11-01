@@ -1,9 +1,16 @@
 # igigi
 
-rpi robot w/ stereo cam, 3 link head 
+Multi-computer, multi-modal robot that uses AI to interact with the world.
 
+### Description
 
-# VLM (Video Language Model)
+The three main nodes are:
+
+`robot` - A Raspbery Pi with a 3-link arm, a monocular camera, and a stereo camera.
+`brain` - A linux server with a GPU that runs a VLM
+`vizzi` - A linux server that runs a VR visualizer for the robot
+
+### VLM (Video Language Model)
 
 LLaVA 13B running locally at 8bit on a docker container (14G VRAM)
 
@@ -23,3 +30,15 @@ docker cp 68f397c04dc0:/src/predict.py predict.py
 docker cp predict.py 68f397c04dc0:/src/predict.py
 docker commit 68f397c04dc0 llava13b
 ```
+
+### LLM (Language Language Model)
+
+GPT-4 via API (OpenAI)
+
+### Visualization
+
+VR visualization is done via WebXR and a Quest Pro
+
+### Notes
+
+All nodes must be communicating via local network, set up ssh keys for passwordless login.
