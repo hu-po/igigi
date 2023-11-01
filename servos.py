@@ -39,11 +39,11 @@ class Pose:
     desc: str # description of static pose for llm use
 
 POSES: Dict[str, Pose] = {
-    "home" : Pose("home", [180, 211, 180], "home position or look up"),
-    "forward" : Pose("forward", [180, 140, 180], "look ahead, facing forward"),
-    "face_left" : Pose("face_left", [215, 130, 151], "looking forward, head tilted right"),
-    "face_right" : Pose("face_right", [145, 130, 209], "looking forward, head tilted left"),
-    "face_down": Pose("face_down", [180, 94, 180], "looking down, facing forward")
+    "home" : Pose("home", [180, 211, 180], "home/reset position, or looking up to the sky"),
+    "forward" : Pose("forward", [180, 140, 180], "looking ahead, facing forward"),
+    "face_left" : Pose("face_left", [215, 130, 151], "looking all the way to the left"),
+    "face_right" : Pose("face_right", [145, 130, 209], "looking all the way to the right"),
+    "face_down": Pose("face_down", [180, 94, 180], "looking down at the ground, facing forward")
 }
 
 @dataclass
@@ -54,10 +54,10 @@ class Move:
 
 VELOCITY: int = 10 # degrees per move
 MOVES: Dict[str, Move] = {
-    "up" : Move("up", [0, VELOCITY, 0], "look more upwards"),
-    "down" : Move("down", [0, -VELOCITY, 0], "look more down"),
-    "left" : Move("left", [0, 0, -VELOCITY], "look a little to the left"),
-    "right" : Move("right", [0, 0, VELOCITY], "look to the right"),
+    "up" : Move("up", [0, VELOCITY, 0], "look more upwards, move slightly up"),
+    "down" : Move("down", [0, -VELOCITY, 0], "look more downwards, move slightly down"),
+    "left" : Move("left", [0, 0, -VELOCITY], "look more to the left, move slightly left"),
+    "right" : Move("right", [0, 0, VELOCITY], "look more to the right, move slightly right"),
 }
 
 # Convert servo units into degrees for readability
@@ -124,6 +124,7 @@ class Servos:
         action: str,
         epsilon: int = 3, # degrees
         timeout: int = 1, # timeout for a move in seconds
+        interval: float = 0.1, # interval between position reads in seconds
     ) -> str:
         timeout: timedelta = timedelta(seconds=timeout)
         start_time = time.time()
@@ -143,21 +144,20 @@ class Servos:
                 move_log += f"ERROR: Could not find a match for desired action {action}.\n"
                 return move_log
         move_log += f"Goal position is {goal_position}."
-        try:
-            while True:
-                elapsed_time = time.time() - start_time
-                self._write_position(goal_position)
-                true_positions = self._read_pos()
-                move_log += f"Current position is {true_positions}."
-                if epsilon > sum(abs(true_positions[i] - goal_position[i]) for i in range(len(goal_position))):
-                    move_log += f"Action succeeded in {elapsed_time} seconds."
-                    break
-                if elapsed_time > timeout.total_seconds():
-                    move_log += f"Action timed out after {elapsed_time} seconds."
-                    break 
-        except Exception as e:
-            move_log += f"Action failed with exception {e}"
-            log.warning(move_log)
+        while True:
+            elapsed_time = time.time() - start_time
+            if elapsed_time > timeout.total_seconds():
+                move_log += f"Action timed out after {elapsed_time} seconds."
+                break
+            self._write_position(goal_position)
+            true_positions = self._read_pos()
+            distance_to_target: int = sum(abs(true_positions[i] - goal_position[i]) for i in range(len(goal_position)))
+            move_log += f"Distance to target is {distance_to_target}."
+            if epsilon > distance_to_target:
+                move_log += f"Action succeeded in {elapsed_time} seconds."
+                break
+            time.sleep(interval)
+        move_log += f"Current position is {self._read_pos()}."
         return move_log + "\n"
 
     def _write_position(self, positions: List[int]) -> str:

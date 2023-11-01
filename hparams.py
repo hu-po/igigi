@@ -1,5 +1,5 @@
 HPARAMS = {
-    "vlm_prompt": "Is there a person in this image? Where are they? On the left? right? center?",
+    "vlm_prompt": "Is there a person in this image? Where are they? On the left? right? center? What direction should we move the camera to get a better view of them?",
     "vlm_docker_url": "http://localhost:5000/predictions",
     "robot_llm_system_prompt": "The user will describe in natural language a desired action. Choose one of the following actions based on the command. Return only the name of the action. Here are the available actions: \n",
     "robot_llm_model": "gpt-3.5-turbo",
@@ -18,14 +18,17 @@ HPARAMS = {
     "video_filename": "igigi.video.mp4",
     "robotlog_filename": "igigi.robotlog.txt",
     "commands_filename": "igigi.command.txt",
-    "video_duration": "1",
-    "video_fps": "30",
+    "video_duration": 1,
+    "video_fps": 30,
     "timeout_find_file": 2,
     "timeout_send_file": 2,
     "timeout_record_video": 2,
     "timeout_take_image": 2,
     "timeout_move_servos": 2,
     "timeout_run_vlm": 2,
+    "move_epsilon_degrees": 10,
+    "move_timeout_seconds": 0.8,
+    "move_interval_seconds": 0.01,
 }
 
 # TODO: Make unique folders for each run, somehow use same uuid for all computers
