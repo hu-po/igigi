@@ -2,7 +2,7 @@ import asyncio
 import os
 
 from hparams import HPARAMS
-from utils import find_file, send_file
+from utils import find_file, send_file, create_session_folder
 from vlm import VLMDocker, run_vlm
 
 
@@ -19,13 +19,13 @@ async def main_loop(hparams: dict = HPARAMS):
     task_batch = [
         find_file(
             HPARAMS["robotlog_filename"],
-            HPARAMS["brain_data_dir"],
+            os.path.join(HPARAMS["brain_data_dir"], HPARAMS["session_name"]),
             HPARAMS["scrape_interval"],
             HPARAMS["scrape_timeout"],
         ),
         find_file(
             HPARAMS["image_filename"],
-            HPARAMS["brain_data_dir"],
+            os.path.join(HPARAMS["brain_data_dir"], HPARAMS["session_name"]),
             HPARAMS["scrape_interval"],
             HPARAMS["scrape_timeout"],
         ),
@@ -37,7 +37,11 @@ async def main_loop(hparams: dict = HPARAMS):
         run_vlm(
             HPARAMS["vlm_prompt"],
             HPARAMS["vlm_docker_url"],
-            os.path.join(HPARAMS["brain_data_dir"], HPARAMS["image_filename"]),
+            os.path.join(
+                HPARAMS["brain_data_dir"],
+                HPARAMS["session_name"],
+                HPARAMS["image_filename"],
+            ),
         ),
     ]
     results = await asyncio.gather(*task_batch, return_exceptions=True)
@@ -46,8 +50,8 @@ async def main_loop(hparams: dict = HPARAMS):
     task_batch = [
         send_file(
             HPARAMS["commands_filename"],
-            HPARAMS["brain_data_dir"],
-            HPARAMS["robot_data_dir"],
+            os.path.join(HPARAMS["brain_data_dir"], HPARAMS["session_name"]),
+            os.path.join(HPARAMS["robot_data_dir"], HPARAMS["session_name"]),
             HPARAMS["robot_username"],
             HPARAMS["robot_ip"],
         ),
@@ -56,5 +60,6 @@ async def main_loop(hparams: dict = HPARAMS):
 
 
 if __name__ == "__main__":
+    HPARAMS["session_name"] = create_session_folder(HPARAMS["brain_data_dir"])
     docker = VLMDocker()
     asyncio.run(main_loop())

@@ -14,10 +14,10 @@ HPARAMS = {
     "vizzy_data_dir": "/home/ook/dev/data/",
     "vizzy_ip": "192.168.1.10",
     "vizzy_username": "ook",
-    "image_filename": "igigi.image.png",
-    "video_filename": "igigi.video.mp4",
-    "robotlog_filename": "igigi.robotlog.txt",
-    "commands_filename": "igigi.command.txt",
+    "image_filename": "image.png",
+    "video_filename": "video.mp4",
+    "robotlog_filename": "robotlog.txt",
+    "commands_filename": "command.txt",
     "video_duration": 1,
     "video_fps": 30,
     "timeout_find_file": 2,
@@ -29,14 +29,7 @@ HPARAMS = {
     "move_epsilon_degrees": 10,
     "move_timeout_seconds": 0.8,
     "move_interval_seconds": 0.01,
+    "seed" : 42,
+    "folder_stem" : "igigi",
+    "date_format" : "%d.%m.%Y",
 }
-
-# TODO: Make unique folders for each run, somehow use same uuid for all computers
-
-# # Generate a unique id for this generation session
-# session_id = str(uuid.uuid4())[:6]
-# hparams["session_id"] = session_id
-
-# # Create a output folder for the session id and use that as the output dir
-# hparams["brain_data_dir"] = os.path.join(hparams.get("brain_data_dir"), session_id)
-# os.makedirs(hparams["brain_data_dir"], exist_ok=True)
