@@ -18,6 +18,7 @@ HPARAMS = {
     "video_filename": "video.mp4",
     "robotlog_filename": "robotlog.txt",
     "commands_filename": "command.txt",
+    "commands_max_age": 100000,
     "video_duration": 1,
     "video_fps": 30,
     "timeout_find_file": 2,
