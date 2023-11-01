@@ -245,13 +245,22 @@ class Servos:
 def test_servos() -> None:
     log.setLevel(logging.DEBUG)
     log.debug("Testing move")
-    robot = Servos()
-    for pose in robot.poses.values():
-        print(robot.move(pose.name))
-    robot.move("home")
-    for move in robot.moves.values():
-        print(robot.move(move.name))
+    servos = Servos()
+    for pose in servos.poses.values():
+        print(servos.move(pose.name))
+    servos.move("home")
+    for move in servos.moves.values():
+        print(servos.move(move.name))
+
+def limp_mode() -> None:
+    log.setLevel(logging.DEBUG)
+    log.debug("Testing move")
+    servos = Servos()
+    servos._disable_torque()
+    while True:
+        print(servos._read_pos())        
 
 
 if __name__ == "__main__":
     test_servos()
+    limp_mode()
