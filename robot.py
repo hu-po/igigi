@@ -16,8 +16,7 @@ async def main_loop(servos: Servos, ui: ChromeUI):
         find_file(
             HPARAMS["commands_filename"],
             os.path.join(HPARAMS["robot_data_dir"], HPARAMS["session_name"]),
-            HPARAMS["scrape_interval"],
-            HPARAMS["scrape_timeout"],
+            HPARAMS["find_file_interval"],
         ),
         take_image(
             CAMERAS["stereo"],

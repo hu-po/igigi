@@ -21,6 +21,7 @@ HPARAMS = {
     "video_duration": 1,
     "video_fps": 30,
     "timeout_find_file": 2,
+    "find_file_interval": 0.1,
     "timeout_send_file": 2,
     "timeout_record_video": 10,
     "timeout_take_image": 10,
