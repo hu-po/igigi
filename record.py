@@ -116,9 +116,9 @@ async def take_image(
 async def test_cameras():
     for name, camera in CAMERAS.items():
         print(f"Testing camera {name}")
-        result = await take_image(camera)
+        result = await take_image(camera, f"test.{name}.png")
         print(result)
-        result = await record_video(camera)
+        result = await record_video(camera, f"test.{name}.mp4")
         print(result)
 
 

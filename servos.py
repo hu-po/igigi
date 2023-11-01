@@ -257,6 +257,7 @@ def test_servos() -> None:
     servos.move("home")
     for move in servos.moves.values():
         print(servos.move(move.name))
+    servos.move("home")
 
 def limp_mode() -> None:
     log.setLevel(logging.DEBUG)
