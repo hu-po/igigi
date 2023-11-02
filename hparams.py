@@ -101,6 +101,14 @@ HPARAMS["cameras"] = {
     ),
 }
 
+# HACK: No explicit Coroutine type
+Coroutine = Any
+
+@dataclass
+class Task:
+    name: str
+    coro: Coroutine
+
 # Brain is the main computer that runs the VLM on a GPU
 HPARAMS["brain_ip"]: str = "192.168.1.44"
 HPARAMS["brain_username"]: str = "oop"
