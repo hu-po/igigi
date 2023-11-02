@@ -7,15 +7,22 @@ from hparams import HPARAMS, Task
 
 
 async def time_it(task: Task) -> Dict[str, Any]:
-    prefix = f"{HPARAMS['time_token']} started {task.name} at {time.strftime(HPARAMS['time_format'])}\n"
+    prefix = f"{HPARAMS['time_token']} started {task.name} at {time.strftime(HPARAMS['time_format'])}"
     print(prefix)
     start_time = time.time()
-    result = await task.coro
-    suffix = f"{HPARAMS['time_token']} finished {task.name} at {time.strftime(HPARAMS['time_format'])}, took {time.time() - start_time:.2f}s\n"
-    print(suffix)
-    result["log"] = f"{prefix}{result['log']}\n{suffix}"
+    
+    try:
+        result = await asyncio.wait_for(task.coro, timeout=task.timeout)
+    except asyncio.TimeoutError:
+        suffix = f"{HPARAMS['time_token']} {HPARAMS['fail_token']} timedout {task.name} at {time.strftime(HPARAMS['time_format'])}"
+    else:
+        suffix = f"{HPARAMS['time_token']} finished {task.name} at {time.strftime(HPARAMS['time_format'])}"
+    finally:
+        elapsed_time = time.time() - start_time
+        suffix += f" took {elapsed_time:.2f}s"
+        print(suffix)
+    result["log"] = f"{prefix}\n{result['log']}\n{suffix}"
     return result
-
 
 async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
     node_token: str = HPARAMS[f"{node_name}_token"]
@@ -29,7 +36,7 @@ async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
     results = await asyncio.gather(*[time_it(task) for task in task_batch], return_exceptions=True)
     for i, result in enumerate(results):
         if isinstance(result, Exception):
-            log = f"{node_token}{HPARAMS['fail_token']} {task_batch[i].name} failed with {result}\n"
+            log = f"{node_token} {HPARAMS['fail_token']} {task_batch[i].name} failed with {result}\n"
             print(log)
             out["log"] += log
             continue

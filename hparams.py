@@ -108,6 +108,7 @@ Coroutine = Any
 class Task:
     name: str
     coro: Coroutine
+    timeout: int = 8 # seconds
 
 # Brain is the main computer that runs the VLM on a GPU
 HPARAMS["brain_ip"]: str = "192.168.1.44"
