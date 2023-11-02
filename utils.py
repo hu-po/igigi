@@ -103,10 +103,10 @@ async def send_file(
 async def write_log(
     log: str,
     node_name: str,
-    directory: str,
 ) -> Dict[str, Any]:
     node_token: str = HPARAMS[f"{node_name}_token"]
     filename: str = HPARAMS[f"{node_name}log_filename"]
+    directory: str = HPARAMS[f"{node_name}_data_dir"]
     full_path: str = os.path.join(directory, filename)
     out: Dict[str, Any] = {"log": f"{HPARAMS['save_token']} saving log for {node_token}"}
     with open(full_path, "a") as f:
