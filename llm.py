@@ -2,10 +2,7 @@ import openai
 from typing import Any, Dict, List
 
 from hparams import HPARAMS
-from utils import async_task
 
-
-@async_task(timeout=HPARAMS["timeout_run_llm"])
 async def run_llm(
     messages: List[Dict[str, str]],
     model: str = HPARAMS["robot_llm_model"],
