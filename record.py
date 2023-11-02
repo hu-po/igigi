@@ -22,7 +22,7 @@ async def record_video(
         return {"log": f"Error opening camera {camera.device}", "video_output_path": output_path}
     
     # Define the codec and create VideoWriter object
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    fourcc = cv2.VideoWriter_fourcc(*'MJPG')
     out = cv2.VideoWriter(output_path, fourcc, fps, (camera.width, camera.height))
     
     for _ in range(int(fps * duration)):
@@ -47,7 +47,7 @@ async def take_image(
     camera: Camera,
     filename: str = HPARAMS["image_filename"],
     output_dir: str = HPARAMS["robot_data_dir"],
-    flip_vertical: bool = False,   # <-- New kwarg
+    flip_vertical: bool = True,   # <-- New kwarg
 ) -> Dict[str, Any]:
     output_path: str = os.path.join(output_dir, filename)
     
