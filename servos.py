@@ -242,7 +242,7 @@ def test_servos() -> None:
     servos = Servos()
     for name, pose in HPARAMS["poses"].items():
         print(f"Moving to pose {name}")
-        result = await asyncio.wait_for(servo_action(name, servos))
+        result = asyncio.run([servo_action(name, servos)])
         print(result)
         time.sleep(1)
 
