@@ -8,7 +8,7 @@ from vlm import VLMDocker, run_vlm
 
 def brain_main_loop():
     os.makedirs(HPARAMS["brain_data_dir"], exist_ok=True, clear=True)
-    docker = VLMDocker()
+    _ = VLMDocker()
     # startup tasks
     tasks = [find_file("image", HPARAMS["image_filename"], HPARAMS["brain_data_dir"])]
     while True:

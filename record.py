@@ -40,12 +40,12 @@ async def record_video(
     if process.returncode != 0:
         return {
             "log": f"Error on video capture: {stderr.decode()}",
-            "output_path": output_path,
+            "video_output_path": output_path,
         }
     else:
         return {
             "log": f"Video from {camera.name} saved to {filename}. Duration: {duration} seconds. Size {camera.width}x{camera.height} at {fps} fps.",
-            "output_path": output_path,
+            "video_output_path": output_path,
         }
 
 
@@ -81,7 +81,7 @@ async def take_image(
     else:
         return {
             "log": f"Image from {camera.name} saved to {filename}. Size {camera.width}x{camera.height}.",
-            "output_path": output_path,
+            "image_output_path": output_path,
         }
 
 

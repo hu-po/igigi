@@ -55,7 +55,7 @@ async def task_batch(task_batch) -> Dict[str, Any]:
 
 @async_task(timeout=HPARAMS["timeout_find_file"])
 async def find_file(
-    name: str,
+    retkey: str,
     filename: str,
     directory: str,
     interval: float = HPARAMS["find_file_interval"],
@@ -63,15 +63,18 @@ async def find_file(
 ) -> Dict[str, Any]:
     while True:
         if filename in os.listdir(directory):
+            out: Dict[str, Any] = {"log" : f"Found {filename}."}
             full_path = os.path.join(directory, filename)
             file_time = os.path.getmtime(full_path)
             file_age = time.time() - file_time
-            return {
-                "log": f"Found {filename}, last modified {file_age} seconds ago.",
-                f"{name}_path": full_path,
-                f"{name}_age": file_age,
-            }
+            out[f"{retkey}_path"] = full_path
+            out[f"{retkey}_age"] = file_age
+            if open:
+                with open(full_path, "r") as f:
+                    out[retkey] = f.read()
+            return out
         await asyncio.sleep(interval)
+    
 
 
 @async_task(timeout=HPARAMS["timeout_send_file"])
