@@ -71,9 +71,9 @@ def _loop():
         if state.get("reply", None) is not None:
             # if action, move servos
             tasks.append(servo_action(state["reply"], servos))
-        else:
-            # if no action, move to forward position
-            tasks.append(servo_action("forward", servos))
+        # else:
+        #     # if no action, move to forward position
+        #     tasks.append(servo_action("forward", servos))
 
 
 if __name__ == "__main__":

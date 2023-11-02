@@ -84,7 +84,7 @@ HPARAMS: Dict[str, Any] = {
     # Movement parameters
     "timeout_move_servos": 2,
     "move_speed": 32,
-    "move_duration": 1,
+    "move_duration": 1.6,
     "move_interval": 0.001,
     # Raw servo parameters
     "protocol_version": 2.0,
