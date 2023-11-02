@@ -224,12 +224,12 @@ async def set_servos(
     return out
 
 
-def test_servos() -> None:
+async def test_servos() -> None:
     print("Testing servos")
     servos = Servos()
     for name, pose in HPARAMS["poses"].items():
         print(f"Moving to pose {name}")
-        result = asyncio.run([set_servos(name, servos)])
+        result = await set_servos(name, servos)
         print(result)
         time.sleep(1)
 
@@ -243,5 +243,5 @@ def limp_mode() -> None:
 
 
 if __name__ == "__main__":
-    test_servos()
+    asyncio.run(test_servos())
     # limp_mode()
