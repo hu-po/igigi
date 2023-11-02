@@ -40,22 +40,22 @@ async def movement_action(
     duration: int = HPARAMS["move_duration"],
     interval: float = HPARAMS["move_interval"],
 ):
-    log: str = ""
+    log: str = f"Action {action}."
     # Pick the goal position
     desired_pose = pose_dict.get(action, None)
     if desired_pose is not None:
-        log += f"Action is moving to static position {desired_pose.name}"
+        log += "is a Pose."
         goal_position = desired_pose.angles
     else:
         desired_move = move_dict.get(action, None)
         if desired_move is not None:
-            log += f"Action is moving {desired_move.name}"
+            log += "is a Move."
             move_vector = [x * speed for x in desired_move.vector]
             log += f"Move vector is {move_vector}."
             true_position = servos._read_pos()
             goal_position = [move_vector[i] + true_position[i] for i in range(len(move_vector))]
         else:
-            log += f"Action {action} is not valid. Moving to home position."
+            log += "is not valid. Moving to home position."
             goal_position = pose_dict["home"].angles
     log += f"Goal position is {goal_position}."
     # Move to the goal position over timeout seconds

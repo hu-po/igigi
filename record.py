@@ -1,37 +1,9 @@
 import asyncio
 import os
 from typing import Any, Dict
-from dataclasses import dataclass
 
-from hparams import HPARAMS
+from hparams import HPARAMS, Camera
 from utils import async_timeout
-
-
-@dataclass
-class Camera:
-    device: str
-    name: str
-    width: int
-    height: int
-    desc: str
-
-
-CAMERAS: Dict[str, Camera] = {
-    "stereo": Camera(
-        device="/dev/video0",
-        name="stereo",
-        width=1280,
-        height=480,
-        desc="stereo camera facing forward",
-    ),
-    "mono": Camera(
-        device="/dev/video2",
-        name="mono",
-        width=640,
-        height=480,
-        desc="monocular camera facing forward",
-    ),
-}
 
 
 @async_timeout(timeout=HPARAMS["timeout_record_video"])
@@ -114,7 +86,7 @@ async def take_image(
 
 
 async def test_cameras():
-    for name, camera in CAMERAS.items():
+    for name, camera in HPARAMS['cameras'].items():
         print(f"Testing camera {name}")
         result = await take_image(camera, f"test.{name}.png")
         print(result)

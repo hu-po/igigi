@@ -35,7 +35,7 @@ class Servos:
 
     def __init__(
         self,
-        servos: Dict[str, Servo],
+        servos: Dict[str, Servo] = HPARAMS["servos"],
         protocol_version: float = 2.0,
         baudrate: int = 57600,
         device_name: str = "/dev/ttyUSB0",
