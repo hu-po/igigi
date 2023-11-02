@@ -98,11 +98,11 @@ HPARAMS: Dict[str, Any] = {
 }
 
 HPARAMS["poses"] = {
-    "home": Pose([180, 225, 180], "home/reset position, or looking up to the sky"),
-    "forward": Pose([180, 180, 180], "looking ahead, facing forward"),
-    "face_left": Pose([180, 180, 270], "looking all the way to the left"),
-    "face_right": Pose([180, 180, 90], "looking all the way to the right"),
-    "face_down": Pose([180, 90, 180], "looking down at the ground, facing forward"),
+    # "home": Pose([180, 225, 180], "home/reset position, or looking up to the sky"),
+    "forward": Pose([180, 180, 180], "looking ahead, facing forward, default option if you are uncertain"),
+    # "face_left": Pose([180, 180, 270], "looking all the way to the left"),
+    # "face_right": Pose([180, 180, 90], "looking all the way to the right"),
+    # "face_down": Pose([180, 90, 180], "looking down at the ground, facing forward"),
 }
 
 HPARAMS["moves"] = {
@@ -110,8 +110,8 @@ HPARAMS["moves"] = {
     "down": Move([0, 1, 0], "look more downwards, move slightly down"),
     "left": Move([0, 0, 1], "look more to the left, move slightly left"),
     "right": Move([0, 0, -1], "look more to the right, move slightly right"),
-    "tilt_left": Move([-1, 0, 0], "roll or tilt head to the left"),
-    "tilt_right": Move([1, 0, 0], "roll or tilt head to the right"),
+#     "tilt_left": Move([-1, 0, 0], "roll or tilt head to the left"),
+#     "tilt_right": Move([1, 0, 0], "roll or tilt head to the right"),
 }
 
 HPARAMS["servos"] = {
