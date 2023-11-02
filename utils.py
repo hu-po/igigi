@@ -12,7 +12,7 @@ async def time_it(task: Task) -> Dict[str, Any]:
     start_time = time.time()
     result = await asyncio.wait_for(task.coro, timeout=task.timeout)
     elapsed_time = time.time() - start_time
-    suffix: str = f"... completed! took {elapsed_time:.2f}s"
+    suffix: str = f"{HPARAMS['time_token']} finished {task.name} took {elapsed_time:.2f}s"
     print(suffix)
     result["log"] = f"{prefix}\n{result['log']}\n{suffix}"
     return result
@@ -30,11 +30,11 @@ async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
     for i, result in enumerate(results):
         if isinstance(result, Exception):
             if isinstance(result, asyncio.TimeoutError):
-                log = f"{node_token} {HPARAMS['fail_token']} {task_batch[i].name} timed out\n"
+                log = f"{node_token} {HPARAMS['fail_token']} {task_batch[i].name} timed out"
             else:
-                log = f"{node_token} {HPARAMS['fail_token']} {task_batch[i].name} failed with {result}\n"
+                log = f"{node_token} {HPARAMS['fail_token']} {task_batch[i].name} failed with {result}"
             print(log)
-            out["log"] += log
+            out["log"] += f"{log}\n"
             continue
         for name, value in result.items():
             if name == "log":
@@ -43,9 +43,9 @@ async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
                 out["log"] += log
             else:
                 out[name] = value
-    suffix: str = f"{node_token} finished batch of {len(task_batch)} tasks\n"
+    suffix: str = f"{node_token} finished batch of {len(task_batch)} tasks"
     print(suffix)
-    out["log"] += suffix
+    out["log"] += f"{suffix}\n"
     return out
 
 
