@@ -7,20 +7,12 @@ from hparams import HPARAMS, Task
 
 
 async def time_it(task: Task) -> Dict[str, Any]:
-    prefix: str = f"{HPARAMS['time_token']} started {task.name} at {time.strftime(HPARAMS['time_format'])}"
+    prefix: str = f"{HPARAMS['time_token']} started {task.name}"
     print(prefix)
     start_time = time.time()
-    
-    try:
-        result = await asyncio.wait_for(task.coro, timeout=task.timeout)
-    except asyncio.TimeoutError:
-        suffix: str = f"{HPARAMS['time_token']} {HPARAMS['fail_token']} timedout {task.name}"
-    except Exception as e:
-        suffix: str = f"{HPARAMS['time_token']} {HPARAMS['fail_token']} {task.name} failed with {str(e)}"
-    else:
-        suffix: str = f"{HPARAMS['time_token']} finished {task.name}"
+    result = await asyncio.wait_for(task.coro, timeout=task.timeout)
     elapsed_time = time.time() - start_time
-    suffix += f" took {elapsed_time:.2f}s"
+    suffix: str = f"... completed! took {elapsed_time:.2f}s"
     print(suffix)
     result["log"] = f"{prefix}\n{result['log']}\n{suffix}"
     return result
@@ -31,13 +23,16 @@ async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
         log: str = f"{node_token} no tasks to run."
         print(log)
         return {"log": log}
-    prefix: str = f"{node_token} started batch of {len(task_batch)} tasks\n"
+    prefix: str = f"{node_token} started batch of {len(task_batch)} tasks at {time.strftime(HPARAMS['time_format'])}"
     print(prefix)
-    out: Dict[str, Any] = {"log": prefix}
+    out: Dict[str, Any] = {"log": f"{prefix}\n"}
     results = await asyncio.gather(*[time_it(task) for task in task_batch], return_exceptions=True)
     for i, result in enumerate(results):
         if isinstance(result, Exception):
-            log = f"{node_token} {HPARAMS['fail_token']} {task_batch[i].name} failed with {result}\n"
+            if isinstance(result, asyncio.TimeoutError):
+                log = f"{node_token} {HPARAMS['fail_token']} {task_batch[i].name} timed out\n"
+            else:
+                log = f"{node_token} {HPARAMS['fail_token']} {task_batch[i].name} failed with {result}\n"
             print(log)
             out["log"] += log
             continue
