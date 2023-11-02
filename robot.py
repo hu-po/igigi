@@ -26,7 +26,7 @@ def _loop():
         # Reset tasks
         tasks = []
         # if log hasn't been saved in a while
-        if state.get("robotlog_age", 0) > HPARAMS["robotlog_max_age"]:
+        if state.get("robotlog_age", 0) > HPARAMS["robotlog_max_age"] or state.get("robotlog", None) is None:
             tasks.append(Task("write_log", write_log(state["log"], "robot")))
         # always check for brainlog
         tasks.append(Task("find_file", find_file("robotlog", "robot", read=True)))
@@ -48,7 +48,7 @@ def _loop():
                 {"role": "system", "content": prompt},
                 {"role": "user", "content": state["vlmout"]},
             ]
-            tasks.append(Task("run_llm", run_llm(messages)))
+            tasks.append(Task("run_llm", run_llm(messages), HPARAMS["robot_llm_timeout"]))
         else:
             # try and find vlmouts if no vlmout
             tasks.append(Task("find_file", find_file("vlmout", "robot", read=True)))

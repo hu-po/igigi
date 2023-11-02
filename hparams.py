@@ -108,7 +108,7 @@ Coroutine = Any
 class Task:
     name: str
     coro: Coroutine
-    timeout: int = 8 # seconds
+    timeout: int = 2 # seconds
 
 # Brain is the main computer that runs the VLM on a GPU
 HPARAMS["brain_ip"]: str = "192.168.1.44"
@@ -119,6 +119,7 @@ HPARAMS["brainlog_max_age"]: int = 120 # seconds
 HPARAMS["vlm_prompt"]: str = "Stereo left and right. Can I see the person? How should I move my head to find the person? Stereo POV camera."
 HPARAMS["vlm_docker_url"]: str = "http://localhost:5000/predictions"
 HPARAMS["vlmout_filename"]: str = "vlmout.txt"
+HPARAMS["vlm_timeout"]: int = 4 # seconds
 
 # Robot is the Raspberry Pi that controls the Servos, Cameras
 HPARAMS["robot_ip"]: str = "192.168.1.10"
@@ -130,6 +131,8 @@ HPARAMS["robot_llm_prompt"]: str = "Choose the best action based on the user des
 HPARAMS["robot_llm_model"]: str = "gpt-3.5-turbo"
 HPARAMS["robot_llm_temperature"]: float = 0.2
 HPARAMS["robot_llm_max_tokens"]: int = 24
+HPARAMS["robot_llm_timeout"]: int = 4 # seconds
+
 # Image
 HPARAMS["image_filename"]: str = "image.png"
 HPARAMS["image_max_age"]: int = 100000
