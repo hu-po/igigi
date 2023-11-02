@@ -53,9 +53,9 @@ HPARAMS: Dict[str, Any] = {
     "rawaction_max_age": 100000,
     "timeout_run_vlm": 10,
     # Communication
-    "timeout_find_file": 2,
+    "timeout_find_file": 1,
     "find_file_interval": 0.1,
-    "timeout_send_file": 2,
+    "timeout_send_file": 1,
     # Robot
     "robot_data_dir": "/home/pi/dev/data/",
     "robot_ip": "192.168.1.10",
@@ -84,9 +84,9 @@ HPARAMS: Dict[str, Any] = {
     # Movement parameters
     "timeout_move_servos": 2,
     "move_speed": 10,
-    "move_duration": 0.8,
-    "move_interval": 0.01,
-    "move_servo_speed": 15,
+    "move_duration": 2,
+    "move_interval": 0.001,
+    "move_servo_speed": 64,
     # Raw servo parameters
     "protocol_version": 2.0,
     "baudrate": 57600,
