@@ -10,7 +10,7 @@ from utils import async_task
 from servos import Servos
 
 
-@async_task(timeout=HPARAMS["timeout_move_servos"])
+@async_task(timeout=HPARAMS["timeout_run_llm"])
 async def run_llm(
     messages: List[Dict[str, str]],
     model: str = HPARAMS["robot_llm_model"],
@@ -31,6 +31,7 @@ async def run_llm(
         "reply": reply,
     }
 
+@async_task(timeout=HPARAMS["timeout_move_servos"])
 async def movement_action(
     action: str,
     servos: Servos,
@@ -39,7 +40,7 @@ async def movement_action(
     speed: int = HPARAMS["move_speed"],
     duration: int = HPARAMS["move_duration"],
     interval: float = HPARAMS["move_interval"],
-):
+) -> Dict[str, Any]:
     log: str = f"Action {action}."
     # Pick the goal position
     desired_pose = pose_dict.get(action, None)
