@@ -96,3 +96,16 @@ async def send_file(
     else:
         out["log"] += f"Failed to send {filename} to {remote_ip}"
     return out
+
+
+@async_task(timeout=HPARAMS["timeout_write_log"])
+async def write_log(
+    log: str,
+    filename: str,
+    directory: str,
+) -> Dict[str, Any]:
+    out: Dict[str, Any] = {"log": f"{HPARAMS['log']} Saving logs to {filename}."}
+    full_path = os.path.join(directory, filename)
+    with open(full_path, "a") as f:
+        f.write(log)
+    return out

@@ -26,7 +26,8 @@ class ChromeUI:
 with gr.Blocks() as demo:
     gr.Markdown("# IGIGI")
     with gr.Column():
-        gr.Image(HPARAMS["image_filename"])
+        _path = os.path.join(HPARAMS["robot_data_dir"], HPARAMS["image_filename"])
+        gr.Image(_path)
         _path = os.path.join(HPARAMS["robot_data_dir"], HPARAMS["robotlog_filename"])
         with open(_path, "r") as f:
             text = f.read()

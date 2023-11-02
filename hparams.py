@@ -8,6 +8,24 @@ from datetime import datetime
 from dataclasses import dataclass
 from typing import Any, Dict, List, Tuple
 
+HPARAMS: Dict[str, Any] = {
+    "brain_token": "🧠",
+    "robot_token": "🤖",
+    "viewr_token": "🖼️",
+    "image_token": "📷",
+    "video_token": "📹",
+    "timer_token": "⏱️",
+    "user_token": "👤",
+    "servos_token": "🦾",
+    "move_token": "🦿",
+    "save_token": "💾",
+    "up_token": "🔝",
+    "down_token": "⤵️",
+    "left_token": "🔙",
+    "right_token": "🔜",
+    # "scan_token": "🔛",
+    # "_token": "⤴️",
+}
 
 @dataclass
 class Servo:
@@ -16,16 +34,45 @@ class Servo:
     desc: str  # description of servo for llm use
 
 
+HPARAMS["servos"] = {
+    "roll": Servo(1, (1761, 2499), "rolls the neck left and right, roll"),
+    "tilt": Servo(2, (979, 2223), "tilts the head up and down vertically, pitch"),
+    "pan": Servo(3, (988, 3007), "pans the head side to side horizontally, yaw"),
+}
+
+
 @dataclass
 class Pose:
     angles: List[int]  # list of int angles in degrees (0, 360) describing static pose
     desc: str  # description of static pose for llm use
 
 
+HPARAMS["poses"] = {
+    # "home": Pose([180, 225, 180], "home/reset position, or looking up to the sky"),
+    "forward": Pose(
+        [180, 180, 180],
+        "looking ahead, facing forward, default option if you are uncertain",
+    ),
+    # "face_left": Pose([180, 180, 270], "looking all the way to the left"),
+    # "face_right": Pose([180, 180, 90], "looking all the way to the right"),
+    # "face_down": Pose([180, 90, 180], "looking down at the ground, facing forward"),
+}
+
+
 @dataclass
 class Move:
     vector: List[int]  # movement vector in degrees (0, 360) one for each servo
     desc: str  # description of move for llm use
+
+
+HPARAMS["moves"] = {
+    HPARAMS["up_token"] : Move([0, -1, 0], "look up, move slightly upwards"),
+    HPARAMS["down_token"] : Move([0, 1, 0], "look down, move slightly downwards"),
+    HPARAMS["left_token"] : Move([0, 0, 1], "look left, move slightly leftwards"),
+    HPARAMS["right_token"] : Move([0, 0, -1], "look right, move slightly rightwards"),
+    #     "tilt_left": Move([-1, 0, 0], "roll or tilt head to the left"),
+    #     "tilt_right": Move([1, 0, 0], "roll or tilt head to the right"),
+}
 
 
 @dataclass
@@ -35,100 +82,6 @@ class Camera:
     height: int  # height of camera image in pixels
     desc: str  # description of camera for llm use
 
-
-HPARAMS: Dict[str, Any] = {
-    "brain_token": "🧠",
-    "camera_token": "📷",
-    "timer_token": "⏱️",
-    "viz_token": "🖼️",
-    "user_token": "👤",
-    "system_token": "🤖",
-    "servos_token": "🦾",
-    "move_token": "🦿",
-    "seed": 42,
-    "folder_stem": "igigi",
-    "date_format": "%d.%m.%Y",
-    # Brain
-    "brain_data_dir": "/home/oop/dev/data/",
-    "brain_ip": "192.168.1.44",
-    "brain_username": "oop",
-    "timeout_brain_main_loop": 60,
-    "brainlog_filename": "brainlog.txt",
-    # VLM (Brain)
-    "vlm_prompt": "Is there a person in this image? Where are they? On the left? right? center? What direction should we move the camera to get a better view of them?",
-    "vlm_docker_url": "http://localhost:5000/predictions",
-    "rawaction_filename": "rawaction.txt",
-    "rawaction_max_age": 100000,
-    "timeout_run_vlm": 10,
-    # Communication
-    "timeout_find_file": 1,
-    "find_file_interval": 0.1,
-    "timeout_send_file": 1,
-    # Robot
-    "robot_data_dir": "/home/pi/dev/data/",
-    "robot_ip": "192.168.1.10",
-    "robot_username": "pi",
-    "timeout_robot_main_loop": 60,
-    "robotlog_filename": "robotlog.txt",
-    # LLM (Robot)
-    "robot_llm_system_prompt": "Choose the best action based on the user description. Return only the name. Here are the available actions: \n",
-    "robot_llm_model": "gpt-3.5-turbo",
-    "robot_llm_temperature": 0.2,
-    "robot_llm_max_tokens": 32,
-    "timeout_run_llm": 4,
-    # Visualization
-    "vizzy_data_dir": "/home/ook/dev/data/",
-    "vizzy_ip": "192.168.1.10",
-    "vizzy_username": "ook",
-    # Image
-    "image_filename": "image.png",
-    "image_max_age": 100000,
-    "timeout_take_image": 10,
-    # Video
-    "video_filename": "video.mp4",
-    "video_duration": 1,
-    "video_fps": 30,
-    "timeout_record_video": 10,
-    # Movement parameters
-    "timeout_move_servos": 2,
-    "move_speed": 32,
-    "move_duration": 1.6,
-    "move_interval": 0.001,
-    # Raw servo parameters
-    "protocol_version": 2.0,
-    "baudrate": 57600,
-    "device_name": "/dev/ttyUSB0",
-    "addr_torque_enable": 64,
-    "addr_goal_position": 116,
-    "addr_present_position": 132,
-    "torque_enable": 1,
-    "torque_disable": 0,
-}
-
-HPARAMS["poses"] = {
-    # "home": Pose([180, 225, 180], "home/reset position, or looking up to the sky"),
-    "forward": Pose([180, 180, 180], "looking ahead, facing forward, default option if you are uncertain"),
-    # "face_left": Pose([180, 180, 270], "looking all the way to the left"),
-    # "face_right": Pose([180, 180, 90], "looking all the way to the right"),
-    # "face_down": Pose([180, 90, 180], "looking down at the ground, facing forward"),
-}
-
-HPARAMS["moves"] = {
-    "up": Move([0, -1, 0], "look more upwards, move slightly up"),
-    "down": Move([0, 1, 0], "look more downwards, move slightly down"),
-    "left": Move([0, 0, 1], "look more to the left, move slightly left"),
-    "right": Move([0, 0, -1], "look more to the right, move slightly right"),
-#     "tilt_left": Move([-1, 0, 0], "roll or tilt head to the left"),
-#     "tilt_right": Move([1, 0, 0], "roll or tilt head to the right"),
-}
-
-HPARAMS["servos"] = {
-    "roll": Servo(
-        1, (1761, 2499), "rolls the neck left and right rotating the view, roll"
-    ),
-    "tilt": Servo(2, (979, 2223), "tilts the head up and down vertically, pitch"),
-    "pan": Servo(3, (988, 3007), "pans the head side to side horizontally, yaw"),
-}
 
 HPARAMS["cameras"] = {
     "stereo": Camera(
@@ -145,6 +98,67 @@ HPARAMS["cameras"] = {
     ),
 }
 
+# Brain is the main computer that runs the VLM on a GPU
+HPARAMS["brain_ip"]: str = "192.168.1.44"
+HPARAMS["brain_username"]: str = "oop"
+HPARAMS["brain_data_dir"]: str = "/home/oop/dev/data/"
+HPARAMS["brainlog_filename"]: str = f"log.{HPARAMS['brain_token']}.txt"
+HPARAMS["brainlog_max_age"]: int = 120 # seconds
+HPARAMS["vlm_prompt"]: str = "Stereo left and right. Can I see the person? How should I move my head to find the person? Stereo POV camera."
+HPARAMS["vlm_docker_url"]: str = "http://localhost:5000/predictions"
+HPARAMS["vlmout_filename"]: str = "vlmout.txt"
+HPARAMS["timeout_run_vlm"]: str = 10 # seconds
+
+# Robot is the Raspberry Pi that controls the Servos, Cameras
+HPARAMS["robot_ip"]: str = "192.168.1.10"
+HPARAMS["robot_username"]: str = "pi"
+HPARAMS["robot_data_dir"]: str = "/home/pi/dev/data/"
+HPARAMS["robotlog_filename"]: str = f"log.{HPARAMS['robot_token']}.txt"
+HPARAMS["robotlog_max_age"]: int = 120 # seconds
+HPARAMS["robot_llm_prompt"]: str = "Choose the best action based on the user description. Return only the name. Here are the available actions: \n"
+HPARAMS["robot_llm_model"]: str = "gpt-3.5-turbo"
+HPARAMS["robot_llm_temperature"]: float = 0.2
+HPARAMS["robot_llm_max_tokens"]: int = 24
+HPARAMS["timeout_run_llm"]: int = 2 # seconds
+# Image
+HPARAMS["image_filename"]: str = "image.png"
+HPARAMS["image_max_age"]: int = 100000
+HPARAMS["timeout_take_image"]: int = 2 # seconds
+# Video
+HPARAMS["video_filename"]: str = "video.mp4"
+HPARAMS["video_duration"]: int = 1 # seconds
+HPARAMS["video_fps"]: int = 30 # frames per second
+HPARAMS["timeout_record_video"]: int = 10 # seconds
+# Movement parameters
+HPARAMS["timeout_set_servos"]: int = 2 # seconds
+HPARAMS["set_servo_speed"]: int = 32 # degrees per move duration
+HPARAMS["set_servo_duration"]: float = 1.6 # seconds
+HPARAMS["set_servo_interval"]: float = 0.001 # seconds
+# Raw servo parameters
+HPARAMS["protocol_version"]: float = 2.0
+HPARAMS["baudrate"]: int = 57600
+HPARAMS["device_name"]: str = "/dev/ttyUSB0"
+HPARAMS["addr_torque_enable"]: int = 64
+HPARAMS["addr_goal_position"]: int = 116
+HPARAMS["addr_present_position"]: int = 132
+HPARAMS["torque_enable"]: int = 1
+HPARAMS["torque_disable"]: int = 0
+
+# Viewer is a secondary computer that runs a VR WebXR visualization tool
+HPARAMS["viewr_ip"]: str = "192.168.1.10"
+HPARAMS["viewr_username"]: str = "ook"
+HPARAMS["viewr_data_dir"]: str = "/home/ook/dev/data/"
+
+# Misc
+HPARAMS["timeout_find_file"]: float = 1
+HPARAMS["find_file_interval"]: float = 0.1
+HPARAMS["timeout_send_file"]: float = 1
+
+# Misc
+HPARAMS["seed"]: int = 42
+HPARAMS["folder_stem"]: str = "igigi"
+HPARAMS["date_format"]: str = "%d.%m.%Y"
+
 # Create unique session folder based on seed and date
 random.seed(HPARAMS["seed"])
 session_id = str(uuid.UUID(int=random.getrandbits(128)))[:6]
@@ -158,8 +172,8 @@ HPARAMS["brain_data_dir"] = os.path.join(
 HPARAMS["robot_data_dir"] = os.path.join(
     HPARAMS["robot_data_dir"], HPARAMS["session_name"]
 )
-HPARAMS["vizzy_data_dir"] = os.path.join(
-    HPARAMS["vizzy_data_dir"], HPARAMS["session_name"]
+HPARAMS["viewr_data_dir"] = os.path.join(
+    HPARAMS["viewr_data_dir"], HPARAMS["session_name"]
 )
 
 pprint(HPARAMS)

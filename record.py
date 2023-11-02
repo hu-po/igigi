@@ -19,7 +19,7 @@ async def record_video(
     
     cap = cv2.VideoCapture(camera.device)
     if not cap.isOpened():
-        return {"log": f"Error opening camera {camera.device}", "video_output_path": output_path}
+        return {"log": f"{HPARAMS['video_token']} error opening camera {camera.device}\n"}
     
     # Define the codec and create VideoWriter object
     fourcc = cv2.VideoWriter_fourcc(*'MJPG')
@@ -38,7 +38,7 @@ async def record_video(
     out.release()
 
     return {
-        "log": f"Video from saved to {filename}. Duration: {duration} seconds. Size {camera.width}x{camera.height} at {fps} fps.",
+        "log": f"{HPARAMS['video_token']} recorded video of {duration} seconds of size {camera.width}x{camera.height} at {fps} fps\n",
         "video_output_path": output_path,
     }
 
@@ -53,7 +53,7 @@ async def take_image(
     
     cap = cv2.VideoCapture(camera.device)
     if not cap.isOpened():
-        return {"log": f"Error opening camera {camera.device}"}
+        return {"log": f"{HPARAMS['image_token']} error opening camera {camera.device}\n"}
     
     ret, frame = cap.read()
     if ret:
@@ -61,12 +61,12 @@ async def take_image(
             frame = cv2.flip(frame, 0)
         cv2.imwrite(output_path, frame)
     else:
-        return {"log": f"Error capturing image from {camera.device}"}
+        return {"log": f"{HPARAMS['image_token']} error capturing image from {camera.device}\n"}
     
     cap.release()
 
     return {
-        "log": f"Image from saved to {filename}. Size {camera.width}x{camera.height}.",
+        "log": f"{HPARAMS['image_token']} took image of size {camera.width}x{camera.height}\n",
         "image_output_path": output_path,
     }
 

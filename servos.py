@@ -178,15 +178,15 @@ class Servos:
         self.port_handler.closePort()
 
 
-@async_task(timeout=HPARAMS["timeout_move_servos"])
-async def servo_action(
+@async_task(timeout=HPARAMS["timeout_set_servos"])
+async def set_servos(
     action: str,
     servos: Servos,
     pose_dict: Dict[str, Pose] = HPARAMS["poses"],
     move_dict: Dict[str, Move] = HPARAMS["moves"],
-    speed: int = HPARAMS["move_speed"],
-    duration: int = HPARAMS["move_duration"],
-    interval: float = HPARAMS["move_interval"],
+    speed: int = HPARAMS["set_servo_speed"],
+    duration: int = HPARAMS["set_servo_duration"],
+    interval: float = HPARAMS["set_servo_interval"],
 ) -> Dict[str, Any]:
     log: str = f"Action {action}."
     # Pick the goal position
@@ -242,7 +242,7 @@ def test_servos() -> None:
     servos = Servos()
     for name, pose in HPARAMS["poses"].items():
         print(f"Moving to pose {name}")
-        result = asyncio.run([servo_action(name, servos)])
+        result = asyncio.run([set_servos(name, servos)])
         print(result)
         time.sleep(1)
 

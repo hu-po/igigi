@@ -3,7 +3,7 @@ import os
 import shutil
 
 from hparams import HPARAMS
-from utils import find_file, send_file, task_batch
+from utils import find_file, send_file, task_batch, write_log
 from vlm import VLMDocker, run_vlm
 
 
@@ -13,7 +13,10 @@ def _loop():
     os.makedirs(HPARAMS["brain_data_dir"], exist_ok=True)
     _ = VLMDocker()
     # startup tasks
-    tasks = [find_file("image", HPARAMS["image_filename"], HPARAMS["brain_data_dir"])]
+    tasks = [
+        find_file("image", HPARAMS["image_filename"], HPARAMS["brain_data_dir"]),
+        find_file("brainlog", HPARAMS["brainlog_filename"], HPARAMS["brain_data_dir"], read=True),
+    ]
     while True:
         state = asyncio.run(task_batch(tasks))
         # # Write logs to file
@@ -22,6 +25,15 @@ def _loop():
         #     f.write(state["log"])
         # Reset tasks
         tasks = []
+        # if log hasn't been saved in a while
+        if state.get("brainlog_age", 0) > HPARAMS["brainlog_max_age"]:
+            tasks.append(write_log(
+                state["log"],
+                HPARAMS["brainlog_filename"],
+                HPARAMS["brain_data_dir"],
+            ))
+        # always check for brainlog
+        tasks.append(find_file("brainlog", HPARAMS["brainlog_filename"], HPARAMS["brain_data_dir"], read=True))
         # always check for image
         tasks.append(find_file("image", HPARAMS["image_filename"], HPARAMS["brain_data_dir"]))
         # if there is an image, run VLM
@@ -29,12 +41,12 @@ def _loop():
             tasks.append(run_vlm())
         # if there is a VLM output, write and send
         if state.get("reply", None) is not None:
-            _path = os.path.join(HPARAMS["brain_data_dir"], HPARAMS["rawaction_filename"])
+            _path = os.path.join(HPARAMS["brain_data_dir"], HPARAMS["vlmout_filename"])
             # TODO: check if path exists, if it is abve a certain size, delete it
             with open(_path, "w") as f:
                 f.write(state["reply"])
             tasks.append(send_file(
-                HPARAMS["rawaction_filename"],
+                HPARAMS["vlmout_filename"],
                 HPARAMS["brain_data_dir"],
                 HPARAMS["robot_data_dir"],
                 HPARAMS["robot_username"],
