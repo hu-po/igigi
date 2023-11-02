@@ -14,12 +14,12 @@ def _loop():
     if os.path.exists(HPARAMS["robot_data_dir"]):
         shutil.rmtree(HPARAMS["robot_data_dir"])
     os.makedirs(HPARAMS["robot_data_dir"], exist_ok=True)
-    # Robot is a singleton, requires state, start it in home position
+    # Robot is a singleton, requires state
     servos = Servos()
     # ui = ChromeUI()
     tasks = [
         find_file("rawaction", HPARAMS["rawaction_filename"], HPARAMS["robot_data_dir"], read=True),
-        servo_action("home", servos),
+        servo_action("forward", servos),
         take_image(HPARAMS["cameras"]["stereo"]),
         # ui.run_interface(),
     ]
@@ -72,8 +72,8 @@ def _loop():
             # if action, move servos
             tasks.append(servo_action(state["reply"], servos))
         # else:
-        #     # if no action, move to home position
-        #     tasks.append(servo_action("home", servos))
+        #     # if no action, move to forward position
+        #     tasks.append(servo_action("forward", servos))
 
 
 if __name__ == "__main__":

@@ -203,8 +203,8 @@ async def servo_action(
             true_pos = servos._read_pos()
             goal_pos = [move_vector[i] + true_pos[i] for i in range(len(move_vector))]
         else:
-            log += "is not valid. Moving to home position."
-            goal_pos = pose_dict["home"].angles
+            log += "is not valid. Moving to forward position."
+            goal_pos = pose_dict["forward"].angles
     log += f"Goal position is {goal_pos}."
     # Move to the goal position over timeout seconds
     duration: timedelta = timedelta(seconds=duration)

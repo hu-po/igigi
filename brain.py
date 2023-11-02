@@ -30,6 +30,7 @@ def _loop():
         # if there is a VLM output, write and send
         if state.get("reply", None) is not None:
             _path = os.path.join(HPARAMS["brain_data_dir"], HPARAMS["rawaction_filename"])
+            # TODO: check if path exists, if it is abve a certain size, delete it
             with open(_path, "w") as f:
                 f.write(state["reply"])
             tasks.append(send_file(
