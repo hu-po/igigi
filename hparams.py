@@ -49,8 +49,8 @@ HPARAMS: Dict[str, Any] = {
     # VLM (Brain)
     "vlm_prompt": "Is there a person in this image? Where are they? On the left? right? center? What direction should we move the camera to get a better view of them?",
     "vlm_docker_url": "http://localhost:5000/predictions",
-    "rawaction_filename": "command.txt",
-    "commands_max_age": 100000,
+    "rawaction_filename": "rawaction.txt",
+    "rawaction_max_age": 100000,
     "timeout_run_vlm": 2,
     # Communication
     "timeout_find_file": 2,
@@ -63,7 +63,7 @@ HPARAMS: Dict[str, Any] = {
     "timeout_robot_main_loop": 60,
     "robotlog_filename": "robotlog.txt",
     # LLM (Robot)
-    "robot_llm_system_prompt": "The user will describe in natural language a desired action. Choose one of the following actions based on the command. Return only the name of the action. Here are the available actions: \n",
+    "robot_llm_system_prompt": "Choose the best action based on the user description. Return only the name. Here are the available actions: \n",
     "robot_llm_model": "gpt-3.5-turbo",
     "robot_llm_temperature": 0.2,
     "robot_llm_max_tokens": 32,

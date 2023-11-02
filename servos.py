@@ -1,7 +1,10 @@
 import logging
-from typing import Dict, List
+from typing import Any, Dict, List
+import time
+from datetime import timedelta
 
-from hparams import HPARAMS, Servo
+from hparams import HPARAMS, Servo, Pose, Move
+from utils import async_task
 
 from dynamixel_sdk import (
     PortHandler,
@@ -22,14 +25,16 @@ log.setLevel(logging.INFO)
 # Max for units is 4095, which is 360 degrees
 DEGREE_TO_UNIT: float = 4095 / 360.0
 
+
 def degrees_to_units(degree: int) -> int:
     return int(degree * DEGREE_TO_UNIT)
+
 
 def units_to_degrees(position: int) -> int:
     return int(position / DEGREE_TO_UNIT)
 
-class Servos:
 
+class Servos:
     def __init__(
         self,
         servos: Dict[str, Servo] = HPARAMS["servos"],
@@ -52,11 +57,19 @@ class Servos:
         self.num_servos: int = len(self.servos)  # Number of servos to control
 
         # Dynamixel communication parameters
-        self.protocol_version = protocol_version  # DYNAMIXEL Protocol version (1.0 or 2.0)
+        self.protocol_version = (
+            protocol_version  # DYNAMIXEL Protocol version (1.0 or 2.0)
+        )
         self.baudrate = baudrate  # Baudrate for DYNAMIXEL communication
-        self.device_name = device_name  # Name of the device (port) where DYNAMIXELs are connected
-        self.addr_torque_enable = addr_torque_enable  # Address for Torque Enable control table in DYNAMIXEL
-        self.addr_goal_position = addr_goal_position  # Address for Goal Position control table in DYNAMIXEL
+        self.device_name = (
+            device_name  # Name of the device (port) where DYNAMIXELs are connected
+        )
+        self.addr_torque_enable = (
+            addr_torque_enable  # Address for Torque Enable control table in DYNAMIXEL
+        )
+        self.addr_goal_position = (
+            addr_goal_position  # Address for Goal Position control table in DYNAMIXEL
+        )
         self.addr_present_position = addr_present_position  # Address for Present Position control table in DYNAMIXEL
         self.torque_enable = torque_enable  # Value to enable the torque
         self.torque_disable = torque_disable  # Value to disable the torque
@@ -92,12 +105,16 @@ class Servos:
                 raise Exception(msg)
 
             self.group_bulk_write.addParam(
-                dxl_id, self.addr_goal_position, 4, [
-                DXL_LOBYTE(DXL_LOWORD(clipped)),
-                DXL_HIBYTE(DXL_LOWORD(clipped)),
-                DXL_LOBYTE(DXL_HIWORD(clipped)), 
-                DXL_HIBYTE(DXL_HIWORD(clipped)),
-            ])
+                dxl_id,
+                self.addr_goal_position,
+                4,
+                [
+                    DXL_LOBYTE(DXL_LOWORD(clipped)),
+                    DXL_HIBYTE(DXL_LOWORD(clipped)),
+                    DXL_LOBYTE(DXL_HIWORD(clipped)),
+                    DXL_HIBYTE(DXL_HIWORD(clipped)),
+                ],
+            )
 
         # Write goal position
         dxl_comm_result = self.group_bulk_write.txPacket()
@@ -139,14 +156,19 @@ class Servos:
         self.group_bulk_read.clearParam()
 
         return positions
-    
+
     def _disable_torque(self) -> None:
         for servo in self.servos:
             dxl_comm_result, dxl_error = self.packet_handler.write1ByteTxRx(
-                self.port_handler, servo.id, self.addr_torque_enable, self.torque_disable
+                self.port_handler,
+                servo.id,
+                self.addr_torque_enable,
+                self.torque_disable,
             )
             if dxl_comm_result != COMM_SUCCESS:
-                log.error(f"ERROR: {self.packet_handler.getTxRxResult(dxl_comm_result)}")
+                log.error(
+                    f"ERROR: {self.packet_handler.getTxRxResult(dxl_comm_result)}"
+                )
             elif dxl_error != 0:
                 log.error(f"ERROR: {self.packet_handler.getRxPacketError(dxl_error)}")
 
@@ -154,11 +176,79 @@ class Servos:
         self._disable_torque()
         self.port_handler.closePort()
 
-def limp_mode() -> None:
+
+@async_task(timeout=HPARAMS["timeout_move_servos"])
+async def servo_action(
+    action: str,
+    servos: Servos,
+    pose_dict: Dict[str, Pose] = HPARAMS["poses"],
+    move_dict: Dict[str, Move] = HPARAMS["moves"],
+    speed: int = HPARAMS["move_speed"],
+    duration: int = HPARAMS["move_duration"],
+    interval: float = HPARAMS["move_interval"],
+) -> Dict[str, Any]:
+    log: str = f"Action {action}."
+    # Pick the goal position
+    desired_pose = pose_dict.get(action, None)
+    if desired_pose is not None:
+        log += "is a Pose."
+        goal_pos = desired_pose.angles
+    else:
+        desired_move = move_dict.get(action, None)
+        if desired_move is not None:
+            log += "is a Move."
+            move_vector = [x * speed for x in desired_move.vector]
+            log += f"Move vector is {move_vector}."
+            true_pos = servos._read_pos()
+            goal_pos = [move_vector[i] + true_pos[i] for i in range(len(move_vector))]
+        else:
+            log += "is not valid. Moving to home position."
+            goal_pos = pose_dict["home"].angles
+    log += f"Goal position is {goal_pos}."
+    # Move to the goal position over timeout seconds
+    duration: timedelta = timedelta(seconds=duration)
+    start_time = time.time()
+    while True:
+        elapsed_time = time.time() - start_time
+        if elapsed_time > duration.total_seconds():
+            log += f"Action finished after {elapsed_time} seconds."
+            break
+        true_pos = servos._read_pos()
+        # Interpolate between the current position and the goal position
+        # based on the fraction of time elapsed
+        fraction = elapsed_time / duration.total_seconds()
+        interpolated_position = [
+            int((goal_pos[i] - true_pos[i]) * fraction + true_pos[i])
+            for i in range(len(goal_pos))
+        ]
+        servos._write_position(interpolated_position)
+        distance_to_target: int = sum(
+            abs(true_pos[i] - goal_pos[i]) for i in range(len(goal_pos))
+        )
+        log += f"Distance to target is {distance_to_target}."
+        time.sleep(interval)
+    true_pos = servos._read_pos()
+    log += f"Current position is {true_pos}."
+    return {
+        "log": log,
+        "pos": true_pos,
+    }
+
+
+def test_servos() -> None:
     log.setLevel(logging.DEBUG)
     log.debug("Testing move")
     servos = Servos()
-    servos._write_position(HPARAMS["poses"]["home"].angles)
+    for name, pose in HPARAMS["poses"].items():
+        print(f"Moving to pose {name}")
+        servo_action(name, servos)
+        time.sleep(1)
+
+
+def limp_mode() -> None:
+    log.setLevel(logging.DEBUG)
+    log.debug("Limp Mode")
+    servos = Servos()
     servos._disable_torque()
     while True:
         print(servos._read_pos())

@@ -5,8 +5,8 @@ import shutil
 from hparams import HPARAMS
 from utils import find_file, send_file, task_batch
 from record import take_image
-from llm import run_llm, movement_action
-from servos import Servos
+from llm import run_llm
+from servos import Servos, servo_action
 from app import ChromeUI
 
 
@@ -18,8 +18,8 @@ def _loop():
     servos = Servos()
     # ui = ChromeUI()
     tasks = [
-        find_file("command", HPARAMS["rawaction_filename"], HPARAMS["robot_data_dir"], open=True),
-        movement_action("home", servos),
+        find_file("rawaction", HPARAMS["rawaction_filename"], HPARAMS["robot_data_dir"], open=True),
+        servo_action("home", servos),
         take_image(HPARAMS["cameras"]["stereo"]),
     ]
     while True:
@@ -50,9 +50,9 @@ def _loop():
         #         HPARAMS["vizzy_ip"],
         #         HPARAMS["vizzy_username"],
         #     ))
-        # if commands, call llm
-        if state.get("command", None) is not None:
-            # Add moves and poses to commands
+        # if rawactions, call llm
+        if state.get("rawaction", None) is not None:
+            # Add moves and poses to rawactions
             prompt: str = HPARAMS["robot_llm_system_prompt"]
             for name, move in HPARAMS["moves"].items():
                 prompt += f"{name}: {move.desc}\n"
@@ -60,19 +60,19 @@ def _loop():
                 prompt += f"{name}: {pose.desc}\n"
             messages = [
                 {"role": "system", "content": prompt},
-                {"role": "user", "content": state["commands"]},
+                {"role": "user", "content": state["rawactions"]},
             ]
             tasks.append(run_llm(messages))
         else:
-            # try and find commands if no command
-            tasks.append(find_file("command", HPARAMS["rawaction_filename"], HPARAMS["robot_data_dir"], open=True))
+            # try and find rawactions if no rawaction
+            tasks.append(find_file("rawaction", HPARAMS["rawaction_filename"], HPARAMS["robot_data_dir"], open=True))
         # always move
         if state.get("action", None) is not None:
             # if action, move servos
-            tasks.append(movement_action(state["command"], servos))
+            tasks.append(servo_action(state["action"], servos))
         else:
             # if no action, move to home position
-            tasks.append(movement_action("home", servos))
+            tasks.append(servo_action("home", servos))
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 import os
 import asyncio
 import time
-import pprint
+from pprint import pprint
 from typing import Callable, Any, Dict
 
 from hparams import HPARAMS
