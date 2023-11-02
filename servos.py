@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Any, Dict, List
 import time
@@ -241,7 +242,8 @@ def test_servos() -> None:
     servos = Servos()
     for name, pose in HPARAMS["poses"].items():
         print(f"Moving to pose {name}")
-        servo_action(name, servos)
+        result = await asyncio.wait_for(servo_action(name, servos))
+        print(result)
         time.sleep(1)
 
 
