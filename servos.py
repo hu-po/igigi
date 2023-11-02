@@ -232,6 +232,11 @@ async def test_servos() -> None:
         result = await set_servos(name, servos)
         print(result)
         time.sleep(1)
+    for name, move in HPARAMS["moves"].items():
+        print(f"Moving with move {name}")
+        result = await set_servos(name, servos)
+        print(result)
+        time.sleep(1)
 
 
 def limp_mode() -> None:

@@ -12,7 +12,7 @@ async def time_it(task: Task) -> Dict[str, Any]:
     print(prefix)
     start_time = time.time()
     result = await task
-    suffix = f"{HPARAMS['time_token']} finished {task.get_name()} at {time.time(HPARAMS['time_format'])}, took {time.time() - start_time}s")
+    suffix = f"{HPARAMS['time_token']} finished {task.get_name()} at {time.time(HPARAMS['time_format'])}, took {time.time() - start_time}s"
     print(suffix)
     result["log"] = f"{prefix}{result['log']}\n{suffix}"
     return time.time() - start_time
