@@ -7,20 +7,19 @@ from hparams import HPARAMS, Task
 
 
 async def time_it(task: Task) -> Dict[str, Any]:
-    prefix = f"{HPARAMS['time_token']} started {task.name} at {time.strftime(HPARAMS['time_format'])}"
+    prefix: str = f"{HPARAMS['time_token']} started {task.name} at {time.strftime(HPARAMS['time_format'])}"
     print(prefix)
     start_time = time.time()
     
     try:
         result = await asyncio.wait_for(task.coro, timeout=task.timeout)
     except asyncio.TimeoutError:
-        suffix = f"{HPARAMS['time_token']} {HPARAMS['fail_token']} timedout {task.name} at {time.strftime(HPARAMS['time_format'])}"
+        suffix: str = f"{HPARAMS['time_token']} {HPARAMS['fail_token']} timedout {task.name} at {time.strftime(HPARAMS['time_format'])}"
     else:
-        suffix = f"{HPARAMS['time_token']} finished {task.name} at {time.strftime(HPARAMS['time_format'])}"
-    finally:
-        elapsed_time = time.time() - start_time
-        suffix += f" took {elapsed_time:.2f}s"
-        print(suffix)
+        suffix: str = f"{HPARAMS['time_token']} finished {task.name} at {time.strftime(HPARAMS['time_format'])}"
+    elapsed_time = time.time() - start_time
+    suffix += f" took {elapsed_time:.2f}s"
+    print(suffix)
     result["log"] = f"{prefix}\n{result['log']}\n{suffix}"
     return result
 
