@@ -1,3 +1,4 @@
+import asyncio
 import os
 import subprocess
 import time
@@ -33,8 +34,8 @@ class ChromeUI:
             #         text = f.read()
             #     gr.Textbox(text, label="Text")
 
-    async def run_interface(self):
-        await self.demo.launch()
+    def run_interface(self):
+        return asyncio.create_task(self.demo.launch())
 
     def __del__(self):
         self.proc.terminate()

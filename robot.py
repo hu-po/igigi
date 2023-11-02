@@ -16,7 +16,7 @@ def _loop():
     os.makedirs(HPARAMS["robot_data_dir"], exist_ok=True)
     # Robot is a singleton, requires state, start it in home position
     servos = Servos()
-    ui = ChromeUI()
+    # ui = ChromeUI()
     tasks = [
         find_file("rawaction", HPARAMS["rawaction_filename"], HPARAMS["robot_data_dir"], read=True),
         servo_action("home", servos),
