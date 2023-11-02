@@ -87,9 +87,9 @@ HPARAMS = {
     "timeout_take_image": 10,
     "timeout_move_servos": 2,
     "timeout_run_vlm": 2,
-    "move_epsilon_degrees": 10,
-    "move_timeout_seconds": 0.8,
-    "move_interval_seconds": 0.01,
+    "move_speed": 10,
+    "move_duration": 0.8,
+    "move_interval": 0.01,
     "move_servo_speed": 15, # degrees per move action
     "seed" : 42,
     "folder_stem" : "igigi",

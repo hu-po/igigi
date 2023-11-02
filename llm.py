@@ -1,8 +1,10 @@
 from typing import Any, Dict
 
 import openai
+import time
+from datetime import timedelta
 
-from hparams import HPARAMS
+from hparams import HPARAMS, Pose, Move
 from utils import async_timeout
 from servos import Servos
 
@@ -32,49 +34,57 @@ async def run_llm(
         "reply": reply,
     }
 
-def move(
-    self,
+async def movement_action(
     action: str,
     servos: Servos,
-    epsilon: int = HPARAMS["move_servo_speed"],
-    speed: int = HPARAMS["move_epsilon_degrees"],
-    timeout: int = HPARAMS["move_timeout_seconds"],
-    interval: float = HPARAMS["move_interval_seconds"],
-) -> str:
-    timeout: timedelta = timedelta(seconds=timeout)
-    start_time = time.time()
-    move_log: str = "" #f"Started action at {start_time}."
-    # Check to see if action is one of the static poses
-    desired_pose = self.poses.get(action, None)
+    pose_dict: Dict[str, Pose] = HPARAMS["poses"],
+    move_dict: Dict[str, Move] = HPARAMS["moves"],
+    speed: int = HPARAMS["move_speed"],
+    duration: int = HPARAMS["move_duration"],
+    interval: float = HPARAMS["move_interval"],
+):
+    log: str = ""
+    # Pick the goal position
+    desired_pose = pose_dict.get(action, None)
     if desired_pose is not None:
-        move_log += f"Action is moving to static position {desired_pose.name}"
+        log += f"Action is moving to static position {desired_pose.name}"
         goal_position = desired_pose.angles
     else:
-        # Check to see if action is one of the moves
-        desired_move = self.moves.get(action, None)
+        desired_move = move_dict.get(action, None)
         if desired_move is not None:
-            move_log += f"Action is moving {desired_move.name}"
+            log += f"Action is moving {desired_move.name}"
             move_vector = [x * speed for x in desired_move.vector]
-            move_log += f"Move vector is {move_vector}."
-            true_position = self._read_pos()
+            log += f"Move vector is {move_vector}."
+            true_position = servos._read_pos()
             goal_position = [move_vector[i] + true_position[i] for i in range(len(move_vector))]
         else:
-            move_log += f"ERROR: Could not find a match for desired action {action}.\n"
-            return move_log
-    move_log += f"Goal position is {goal_position}."
+            log += f"Action {action} is not valid. Moving to home position."
+            goal_position = pose_dict["home"].angles
+    log += f"Goal position is {goal_position}."
+    # Move to the goal position over timeout seconds
+    duration: timedelta = timedelta(seconds=duration)
+    start_time = time.time()
     while True:
-        self._write_position(goal_position)
-        true_positions = self._read_pos()
-        distance_to_target: int = sum(abs(true_positions[i] - goal_position[i]) for i in range(len(goal_position)))
-        move_log += f"Distance to target is {distance_to_target}."
-        if epsilon > distance_to_target:
-            move_log += f"Action succeeded in {elapsed_time} seconds."
-            break
-        time.sleep(interval)
         elapsed_time = time.time() - start_time
-        if elapsed_time > timeout.total_seconds():
-            move_log += f"Action timed out after {elapsed_time} seconds."
+        if elapsed_time > duration.total_seconds():
+            log += f"Action finished after {elapsed_time} seconds."
             break
-    move_log += f"Current position is {self._read_pos()}."
-    return move_log + "\n"
+        # Interpolate between the current position and the goal position
+        # based on the fraction of time elapsed
+        fraction = elapsed_time / duration.total_seconds()
+        interpolated_position = [
+            int((goal_position[i] - true_position[i]) * fraction + true_position[i])
+            for i in range(len(goal_position))
+        ]
+        servos._write_position(interpolated_position)
+        true_positions = servos._read_pos()
+        distance_to_target: int = sum(abs(true_positions[i] - goal_position[i]) for i in range(len(goal_position)))
+        log += f"Distance to target is {distance_to_target}."
+        time.sleep(interval)
+    true_positions = servos._read_pos()
+    log += f"Current position is {true_positions}."
+    return {
+        "log": log,
+        "pos": true_positions,
+    }
 

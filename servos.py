@@ -164,7 +164,7 @@ def limp_mode() -> None:
     servos = Servos()
     servos._disable_torque()
     while True:
-        print(servos._read_pos())        
+        print(servos._read_pos())
 
 
 if __name__ == "__main__":
