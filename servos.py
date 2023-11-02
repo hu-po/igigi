@@ -48,6 +48,7 @@ class Servos:
             log.debug(f"id: {servo.id}")
             log.debug(f"range: {servo.range}")
             log.debug(f"description: {servo.desc}")
+            self.servos.append(servo)
         self.num_servos: int = len(self.servos)  # Number of servos to control
 
         # Dynamixel communication parameters
