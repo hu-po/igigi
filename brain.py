@@ -16,10 +16,10 @@ def _loop():
     tasks = [find_file("image", HPARAMS["image_filename"], HPARAMS["brain_data_dir"])]
     while True:
         state = asyncio.run(task_batch(tasks))
-        # Write logs to file
-        _path = os.path.join(HPARAMS["brain_data_dir"], HPARAMS["brainlog_filename"])
-        with open(_path, "a") as f:
-            f.write(state["log"])
+        # # Write logs to file
+        # _path = os.path.join(HPARAMS["brain_data_dir"], HPARAMS["brainlog_filename"])
+        # with open(_path, "a") as f:
+        #     f.write(state["log"])
         # Reset tasks
         tasks = []
         # always check for image
