@@ -37,6 +37,14 @@ class Camera:
 
 
 HPARAMS: Dict[str, Any] = {
+    "brain_token": "🧠",
+    "camera_token": "📷",
+    "timer_token": "⏱️",
+    "viz_token": "🖼️",
+    "user_token": "👤",
+    "system_token": "🤖",
+    "servos_token": "🦾",
+    "move_token": "🦿",
     "seed": 42,
     "folder_stem": "igigi",
     "date_format": "%d.%m.%Y",

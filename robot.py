@@ -25,10 +25,10 @@ def _loop():
     ]
     while True:
         state = asyncio.run(task_batch(tasks))
-        # Write logs to file
-        _path = os.path.join(HPARAMS["robot_data_dir"], HPARAMS["robotlog_filename"])
-        with open(_path, "a") as f:
-            f.write(state["log"])
+        # # Write logs to file
+        # _path = os.path.join(HPARAMS["robot_data_dir"], HPARAMS["robotlog_filename"])
+        # with open(_path, "a") as f:
+        #     f.write(state["log"])
         # Reset tasks
         tasks = []
         # always capture image
