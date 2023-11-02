@@ -77,6 +77,31 @@ async def find_file(
     
 
 
+# @async_task(timeout=HPARAMS["timeout_send_file"])
+# async def send_file(
+#     filename: str,
+#     local_dir_path: str,
+#     remote_dir_path: str,
+#     remote_username: str,
+#     remote_ip: str,
+# ) -> Dict[str, Any]:
+#     out: Dict[str, Any] = {"log" : f"Sending {filename}."}
+#     process = await asyncio.create_subprocess_exec(
+#         *[
+#             "/usr/bin/scp",
+#             os.path.join(local_dir_path, filename),
+#             f"{remote_username}@{remote_ip}:{os.path.join(remote_dir_path, filename)}",
+#         ],
+#         stdout=asyncio.subprocess.PIPE,
+#         stderr=asyncio.subprocess.PIPE,
+#     )
+#     _, stderr = await process.communicate()
+#     if process.returncode == 0:
+#         out["log"] += f"Sent {filename} to {remote_ip}."
+#     else:
+#         out["log"] += f"Error sending {filename} to {remote_ip}: {stderr.decode()}"
+#     return out
+
 @async_task(timeout=HPARAMS["timeout_send_file"])
 async def send_file(
     filename: str,
@@ -84,20 +109,16 @@ async def send_file(
     remote_dir_path: str,
     remote_username: str,
     remote_ip: str,
-) -> Dict[str, Any]:
-    out: Dict[str, Any] = {"log" : f"Sending {filename}."}
-    process = await asyncio.create_subprocess_exec(
-        *[
-            "/usr/bin/scp",
-            os.path.join(local_dir_path, filename),
-            f"{remote_username}@{remote_ip}:{os.path.join(remote_dir_path, filename)}",
-        ],
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    _, stderr = await process.communicate()
-    if process.returncode == 0:
-        out["log"] += f"Sent {filename} to {remote_ip}."
+) -> dict:
+    out: dict = {"log": f"Sending {filename}."}
+    cmd = [
+        "/usr/bin/scp",
+        os.path.join(local_dir_path, filename),
+        f"{remote_username}@{remote_ip}:{os.path.join(remote_dir_path, filename)}",
+    ]
+    result = os.system(cmd)
+    if result == 0:
+        out["log"] += f"Successfully sent {filename} to {remote_ip}"
     else:
-        out["log"] += f"Error sending {filename} to {remote_ip}: {stderr.decode()}"
+        out["log"] += f"Failed to send {filename} to {remote_ip}"
     return out
