@@ -34,7 +34,7 @@ class ChromeUI:
             #     gr.Textbox(text, label="Text")
 
     async def run_interface(self):
-        self.demo.launch()
+        await self.demo.launch()
 
     def __del__(self):
         self.proc.terminate()

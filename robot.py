@@ -21,6 +21,7 @@ def _loop():
         find_file("rawaction", HPARAMS["rawaction_filename"], HPARAMS["robot_data_dir"], read=True),
         servo_action("home", servos),
         take_image(HPARAMS["cameras"]["stereo"]),
+        ui.run_interface(),
     ]
     while True:
         state = asyncio.run(task_batch(tasks))
