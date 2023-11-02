@@ -1,9 +1,7 @@
 import os
 import asyncio
 import time
-import uuid
-import random
-from datetime import datetime
+import pprint
 from typing import Callable, Any, Dict
 
 from hparams import HPARAMS
@@ -37,6 +35,7 @@ def async_task(timeout: int):
 
 
 async def task_batch(task_batch) -> Dict[str, Any]:
+    print("\n\nNew Task Batch")
     if len(task_batch) == 0:
         log: str = "No tasks to run."
         return {"log": log}
@@ -50,6 +49,7 @@ async def task_batch(task_batch) -> Dict[str, Any]:
                 out["log"] += result["log"]
             else:
                 out[name] = value
+    pprint(out["log"])
     return out
 
 

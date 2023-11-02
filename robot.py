@@ -1,7 +1,6 @@
 import asyncio
 import os
-from typing import Any, Dict
-import time
+import shutil
 
 from hparams import HPARAMS
 from utils import find_file, send_file, task_batch
@@ -12,6 +11,8 @@ from app import ChromeUI
 
 
 def _loop():
+    if os.path.exists(HPARAMS["robot_data_dir"]):
+        shutil.rmtree(HPARAMS["robot_data_dir"])
     os.makedirs(HPARAMS["robot_data_dir"], exist_ok=True)
     # Robot is a singleton, requires state, start it in home position
     servos = Servos()
