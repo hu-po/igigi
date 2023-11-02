@@ -1,8 +1,5 @@
 import logging
-import time
-from datetime import timedelta
-from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 from hparams import HPARAMS, Servo
 
@@ -36,19 +33,18 @@ class Servos:
     def __init__(
         self,
         servos: Dict[str, Servo] = HPARAMS["servos"],
-        protocol_version: float = 2.0,
-        baudrate: int = 57600,
-        device_name: str = "/dev/ttyUSB0",
-        addr_torque_enable: int = 64,
-        addr_goal_position: int = 116,
-        addr_present_position: int = 132,
-        torque_enable: int = 1,
-        torque_disable: int = 0,
+        protocol_version: float = HPARAMS["protocol_version"],
+        baudrate: int = HPARAMS["baudrate"],
+        device_name: str = HPARAMS["device_name"],
+        addr_torque_enable: int = HPARAMS["addr_torque_enable"],
+        addr_goal_position: int = HPARAMS["addr_goal_position"],
+        addr_present_position: int = HPARAMS["addr_present_position"],
+        torque_enable: int = HPARAMS["torque_enable"],
+        torque_disable: int = HPARAMS["torque_disable"],
     ):
-        self.servos: List[Servo] = list(servos.values()) # List of Servo objects to control
-        for servo in self.servos:
-            log.debug("---- Initialize servo ----")
-            log.debug(f"servo: {servo.name}")
+        self.servos: List[Servo] = []
+        for name, servo in servos.items():
+            log.debug(f"---- Initialize servo {name} ----")
             log.debug(f"id: {servo.id}")
             log.debug(f"range: {servo.range}")
             log.debug(f"description: {servo.desc}")
@@ -154,7 +150,6 @@ class Servos:
                 log.error(f"ERROR: {self.packet_handler.getRxPacketError(dxl_error)}")
 
     def __del__(self, *args, **kwargs) -> None:
-        self.move("home")
         self._disable_torque()
         self.port_handler.closePort()
 
