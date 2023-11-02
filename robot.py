@@ -70,9 +70,9 @@ def _loop():
         if state.get("reply", None) is not None:
             # if action, move servos
             tasks.append(servo_action(state["reply"], servos))
-        else:
-            # if no action, move to home position
-            tasks.append(servo_action("home", servos))
+        # else:
+        #     # if no action, move to home position
+        #     tasks.append(servo_action("home", servos))
 
 
 if __name__ == "__main__":
