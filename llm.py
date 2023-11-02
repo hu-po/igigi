@@ -67,7 +67,7 @@ async def movement_action(
         if elapsed_time > duration.total_seconds():
             log += f"Action finished after {elapsed_time} seconds."
             break
-        true_positions = servos._read_pos()
+        true_pos = servos._read_pos()
         # Interpolate between the current position and the goal position
         # based on the fraction of time elapsed
         fraction = elapsed_time / duration.total_seconds()
@@ -76,13 +76,13 @@ async def movement_action(
             for i in range(len(goal_pos))
         ]
         servos._write_position(interpolated_position)
-        distance_to_target: int = sum(abs(true_positions[i] - goal_pos[i]) for i in range(len(goal_pos)))
+        distance_to_target: int = sum(abs(true_pos[i] - goal_pos[i]) for i in range(len(goal_pos)))
         log += f"Distance to target is {distance_to_target}."
         time.sleep(interval)
-    true_positions = servos._read_pos()
-    log += f"Current position is {true_positions}."
+    true_pos = servos._read_pos()
+    log += f"Current position is {true_pos}."
     return {
         "log": log,
-        "pos": true_positions,
+        "pos": true_pos,
     }
 
