@@ -116,7 +116,7 @@ async def send_file(
         os.path.join(local_dir_path, filename),
         f"{remote_username}@{remote_ip}:{os.path.join(remote_dir_path, filename)}",
     ]
-    result = os.system(cmd)
+    result = os.system(" ".join(cmd))
     if result == 0:
         out["log"] += f"Successfully sent {filename} to {remote_ip}"
     else:
