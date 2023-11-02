@@ -16,24 +16,20 @@ def _loop():
     # Robot is a singleton, requires state
     servos = Servos()
     tasks = [
-        find_file("vlmout", HPARAMS["vlmout_filename"], HPARAMS["robot_data_dir"], read=True),
-        find_file("robotlog", HPARAMS["robotlog_filename"], HPARAMS["robot_data_dir"], read=True),
+        find_file("vlmout", HPARAMS["robot_data_dir"], read=True),
+        find_file("robotlog", HPARAMS["robot_data_dir"], read=True),
         set_servos("forward", servos),
         take_image(HPARAMS["cameras"]["stereo"]),
     ]
     while True:
-        state = asyncio.run(task_batch(tasks))
+        state = asyncio.run(task_batch(tasks, "robot"))
         # Reset tasks
         tasks = []
         # if log hasn't been saved in a while
         if state.get("robotlog_age", 0) > HPARAMS["robotlog_max_age"]:
-            tasks.append(write_log(
-                state["log"],
-                HPARAMS["robotlog_filename"],
-                HPARAMS["robot_data_dir"],
-            ))
+            tasks.append(write_log(state["log"], "robot"))
         # always check for brainlog
-        tasks.append(find_file("robotlog", HPARAMS["brainlog_filename"], HPARAMS["brain_data_dir"], read=True))
+        tasks.append(find_file("robotlog", HPARAMS["brain_data_dir"], read=True))
         # always capture image
         tasks.append(take_image(HPARAMS["cameras"]["stereo"]))
         # if image, send it to brain
@@ -55,7 +51,7 @@ def _loop():
             tasks.append(run_llm(messages))
         else:
             # try and find vlmouts if no vlmout
-            tasks.append(find_file("vlmout", HPARAMS["vlmout_filename"], HPARAMS["robot_data_dir"], read=True))
+            tasks.append(find_file("vlmout", HPARAMS["robot_data_dir"], read=True))
         # always move
         if state.get("reply", None) is not None:
             # if action, move servos

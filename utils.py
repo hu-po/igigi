@@ -48,12 +48,12 @@ async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
 
 
 async def find_file(
-    retkey: str,
-    filename: str,
+    file_name: str,
     node_name: str,
     interval: float = HPARAMS["find_file_interval"],
     read: bool = False,
 ) -> Dict[str, Any]:
+    filename: str = HPARAMS[f"{file_name}_filename"]
     directory: str = HPARAMS[f"{node_name}_data_dir"]
     node_token: str = HPARAMS[f"{node_name}_token"]
     out: Dict[str, Any] = {"log": f"{HPARAMS['find_token']} looking for {filename} in {node_token}"}

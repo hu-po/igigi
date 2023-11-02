@@ -14,28 +14,20 @@ def _loop():
     _ = VLMDocker()
     # startup tasks
     tasks = [
-        find_file("image", HPARAMS["image_filename"], HPARAMS["brain_data_dir"]),
-        find_file("brainlog", HPARAMS["brainlog_filename"], HPARAMS["brain_data_dir"], read=True),
+        find_file("image", "brain"),
+        find_file("brainlog", "brain", read=True),
     ]
     while True:
-        state = asyncio.run(task_batch(tasks))
-        # # Write logs to file
-        # _path = os.path.join(HPARAMS["brain_data_dir"], HPARAMS["brainlog_filename"])
-        # with open(_path, "a") as f:
-        #     f.write(state["log"])
+        state = asyncio.run(task_batch(tasks, "brain"))
         # Reset tasks
         tasks = []
         # if log hasn't been saved in a while
         if state.get("brainlog_age", 0) > HPARAMS["brainlog_max_age"]:
-            tasks.append(write_log(
-                state["log"],
-                HPARAMS["brainlog_filename"],
-                HPARAMS["brain_data_dir"],
-            ))
+            tasks.append(write_log(state["log"], "brain"))
         # always check for brainlog
-        tasks.append(find_file("brainlog", HPARAMS["brainlog_filename"], HPARAMS["brain_data_dir"], read=True))
+        tasks.append(find_file("brainlog", "brain", read=True))
         # always check for image
-        tasks.append(find_file("image", HPARAMS["image_filename"], HPARAMS["brain_data_dir"]))
+        tasks.append(find_file("image", "brain"))
         # if there is an image, run VLM
         if state.get("image_path", None) is not None:
             tasks.append(run_vlm())
