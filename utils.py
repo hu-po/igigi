@@ -1,24 +1,23 @@
 import os
 import asyncio
-from asyncio import Task
 import time
 from typing import Any, Dict, List
 
 from hparams import HPARAMS
 
 
-async def time_it(task: Task) -> Dict[str, Any]:
-    prefix = f"{HPARAMS['time_token']} started {task.get_name()} at {time.time(HPARAMS['time_format'])}\n"
+async def time_it(task) -> Dict[str, Any]:
+    prefix = f"{HPARAMS['time_token']} started {task.name} at {time.time(HPARAMS['time_format'])}\n"
     print(prefix)
     start_time = time.time()
     result = await task
-    suffix = f"{HPARAMS['time_token']} finished {task.get_name()} at {time.time(HPARAMS['time_format'])}, took {time.time() - start_time}s"
+    suffix = f"{HPARAMS['time_token']} finished {task.name} at {time.time(HPARAMS['time_format'])}, took {time.time() - start_time}s"
     print(suffix)
     result["log"] = f"{prefix}{result['log']}\n{suffix}"
     return time.time() - start_time
 
 
-async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
+async def task_batch(task_batch: List, node_name: str) -> Dict[str, Any]:
     node_token: str = HPARAMS[f"{node_name}_token"]
     if len(task_batch) == 0:
         log: str = f"{node_token} no tasks to run."
@@ -31,7 +30,7 @@ async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
         *[time_it(task) for task in task_batch], return_exceptions=True)
     for i, result in enumerate(results):
         if isinstance(result, Exception):
-            out["log"] += f"{node_token}{HPARAMS['fail_token']} {task_batch[i].get_name()} failed with {result}\n"
+            out["log"] += f"{node_token}{HPARAMS['fail_token']} {task_batch[i].name} failed with {result}\n"
             continue
         for name, value in result.items():
             if name == "log":
