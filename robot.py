@@ -12,7 +12,7 @@ from app import ChromeUI
 
 
 def robot_main_loop() -> Dict[str, Any]:
-    os.makedirs(HPARAMS["robot_data_dir"], exist_ok=True, clear=True)
+    os.makedirs(HPARAMS["robot_data_dir"], exist_ok=True)
     # Robot is a singleton, requires state, start it in home position
     servos = Servos()
     # ui = ChromeUI()
