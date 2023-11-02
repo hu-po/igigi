@@ -40,7 +40,7 @@ async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
                 out["log"] += log
             else:
                 out[name] = value
-    suffix: str = f"{node_token} finished batch of {len(task_batch)} tasks\n"asd
+    suffix: str = f"{node_token} finished batch of {len(task_batch)} tasks\n"
     print(suffix)
     out["log"] += suffix
     return out
