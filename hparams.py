@@ -1,6 +1,7 @@
 import os
 import uuid
 import random
+from pprint import pprint
 
 from datetime import datetime
 
@@ -153,4 +154,4 @@ HPARAMS["vizzy_data_dir"] = os.path.join(
     HPARAMS["vizzy_data_dir"], HPARAMS["session_name"]
 )
 
-print(HPARAMS)
+pprint(HPARAMS)
