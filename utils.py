@@ -63,7 +63,7 @@ async def find_file(
 ) -> Dict[str, Any]:
     while True:
         if filename in os.listdir(directory):
-            out: Dict[str, Any] = {"log" : f"Found {filename}."}
+            out: Dict[str, Any] = {"log": f"Found {filename}."}
             full_path = os.path.join(directory, filename)
             file_time = os.path.getmtime(full_path)
             file_age = time.time() - file_time
@@ -74,33 +74,7 @@ async def find_file(
                     out[retkey] = f.read()
             return out
         await asyncio.sleep(interval)
-    
 
-
-# @async_task(timeout=HPARAMS["timeout_send_file"])
-# async def send_file(
-#     filename: str,
-#     local_dir_path: str,
-#     remote_dir_path: str,
-#     remote_username: str,
-#     remote_ip: str,
-# ) -> Dict[str, Any]:
-#     out: Dict[str, Any] = {"log" : f"Sending {filename}."}
-#     process = await asyncio.create_subprocess_exec(
-#         *[
-#             "/usr/bin/scp",
-#             os.path.join(local_dir_path, filename),
-#             f"{remote_username}@{remote_ip}:{os.path.join(remote_dir_path, filename)}",
-#         ],
-#         stdout=asyncio.subprocess.PIPE,
-#         stderr=asyncio.subprocess.PIPE,
-#     )
-#     _, stderr = await process.communicate()
-#     if process.returncode == 0:
-#         out["log"] += f"Sent {filename} to {remote_ip}."
-#     else:
-#         out["log"] += f"Error sending {filename} to {remote_ip}: {stderr.decode()}"
-#     return out
 
 @async_task(timeout=HPARAMS["timeout_send_file"])
 async def send_file(

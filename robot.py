@@ -60,7 +60,7 @@ def _loop():
                 prompt += f"{name}: {pose.desc}\n"
             messages = [
                 {"role": "system", "content": prompt},
-                {"role": "user", "content": state["rawactions"]},
+                {"role": "user", "content": state["rawaction"]},
             ]
             tasks.append(run_llm(messages))
         else:
