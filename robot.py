@@ -11,7 +11,7 @@ from servos import Servos
 from app import ChromeUI
 
 
-def robot_main_loop() -> Dict[str, Any]:
+def _loop():
     os.makedirs(HPARAMS["robot_data_dir"], exist_ok=True)
     # Robot is a singleton, requires state, start it in home position
     servos = Servos()
@@ -75,4 +75,5 @@ def robot_main_loop() -> Dict[str, Any]:
 
 
 if __name__ == "__main__":
-    robot_main_loop()
+    print("Starting robot main loop.")
+    _loop()

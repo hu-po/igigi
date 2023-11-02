@@ -6,7 +6,7 @@ from utils import find_file, send_file, task_batch
 from vlm import VLMDocker, run_vlm
 
 
-def brain_main_loop():
+def _loop():
     os.makedirs(HPARAMS["brain_data_dir"], exist_ok=True)
     _ = VLMDocker()
     # startup tasks
@@ -39,5 +39,6 @@ def brain_main_loop():
 
 
 if __name__ == "__main__":
-    brain_main_loop()
+    print("Starting brain main loop.")
+    _loop()
 

@@ -152,3 +152,5 @@ HPARAMS["robot_data_dir"] = os.path.join(
 HPARAMS["vizzy_data_dir"] = os.path.join(
     HPARAMS["vizzy_data_dir"], HPARAMS["session_name"]
 )
+
+print(HPARAMS)
