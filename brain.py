@@ -26,8 +26,8 @@ def _loop():
             tasks.append(run_vlm())
         # if there is a VLM output, write and send
         if state.get("reply", None) is not None:
-            command_path = os.path.join(HPARAMS["brain_data_dir"], HPARAMS["rawaction_filename"])
-            with open(command_path, "w") as f:
+            _path = os.path.join(HPARAMS["brain_data_dir"], HPARAMS["rawaction_filename"])
+            with open(_path, "w") as f:
                 f.write(state["reply"])
             tasks.append(send_file(
                 HPARAMS["rawaction_filename"],
