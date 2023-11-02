@@ -157,6 +157,7 @@ def limp_mode() -> None:
     log.setLevel(logging.DEBUG)
     log.debug("Testing move")
     servos = Servos()
+    servos._write_position(HPARAMS["poses"]["home"].angles)
     servos._disable_torque()
     while True:
         print(servos._read_pos())
