@@ -11,7 +11,7 @@ async def time_it(task: Task) -> Dict[str, Any]:
     print(prefix)
     start_time = time.time()
     result = await task.coro
-    suffix = f"{HPARAMS['time_token']} finished {task.name} at {time.strftime(HPARAMS['time_format'])}, took {time.time() - start_time}s"
+    suffix = f"{HPARAMS['time_token']} finished {task.name} at {time.strftime(HPARAMS['time_format'])}, took {time.time() - start_time:.2f}s\n"
     print(suffix)
     result["log"] = f"{prefix}{result['log']}\n{suffix}"
     return result
@@ -40,7 +40,7 @@ async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
                 out["log"] += log
             else:
                 out[name] = value
-    suffix: str = f"{node_token} finished batch of {len(task_batch)} tasks\n"
+    suffix: str = f"{node_token} finished batch of {len(task_batch)} tasks\n"asd
     print(suffix)
     out["log"] += suffix
     return out
