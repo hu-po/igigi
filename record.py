@@ -3,14 +3,14 @@ import os
 from typing import Any, Dict
 
 from hparams import HPARAMS, Camera
-from utils import async_timeout
+from utils import async_task
 
 
-@async_timeout(timeout=HPARAMS["timeout_record_video"])
+@async_task(timeout=HPARAMS["timeout_record_video"])
 async def record_video(
     camera: Camera,
-    filename: str = "test.mp4",
-    output_dir: str = os.environ["DATA_DIR"],
+    filename: str = HPARAMS["video_filename"],
+    output_dir: str = HPARAMS["robot_data_dir"],
     duration: int = HPARAMS["video_duration"],
     fps: int = HPARAMS["video_fps"],
 ) -> Dict[str, Any]:
@@ -49,7 +49,7 @@ async def record_video(
         }
 
 
-@async_timeout(timeout=HPARAMS["timeout_take_image"])
+@async_task(timeout=HPARAMS["timeout_take_image"])
 async def take_image(
     camera: Camera,
     filename: str = HPARAMS["image_filename"],

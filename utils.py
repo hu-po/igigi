@@ -9,29 +9,58 @@ from typing import Callable, Any, Dict
 from hparams import HPARAMS
 
 
-def async_timeout(timeout: int):
+def async_task(timeout: int):
     def decorator(func: Callable) -> Callable:
         async def wrapper(*args: Any, **kwargs: Any) -> Dict[str, Any]:
             try:
-                log: str = f"Calling {func.__name__}."
-                print(log)
-                results = await asyncio.wait_for(func(*args, **kwargs), timeout=timeout)
-                assert "log" in results.keys(), "Could not find log in {func.__name__}"
-                return {"log": log + results["log"], **results}
+                out: Dict[str, Any] = {"log": f"Calling {func.__name__}."}
+                print(out["log"])
+                start_time = time.time()
+                result = await asyncio.wait_for(func(*args, **kwargs), timeout=timeout)
+                duration = time.time() - start_time
+                out["log"] += f"Completed after {duration} seconds."
+                print(out["log"])
+                for name, value in result.items():
+                    if name == "log":
+                        out["log"] += result["log"]
+                    else:
+                        out[name] = value
             except asyncio.TimeoutError:
-                return {
-                    "log": log + f"Timeout after {timeout} seconds in {func.__name__}"
-                }
+                out["log"] += f"Timeout after {timeout} seconds."
             except Exception as e:
-                return {"log": log + f"Exception {e} in {func.__name__}"}
+                out["log"] += f"Exception {e}"
+            return out
 
         return wrapper
 
     return decorator
 
 
-@async_timeout(timeout=HPARAMS["timeout_find_file"])
-async def find_file(filename: str, directory: str, interval: float) -> Dict[str, Any]:
+async def task_batch(task_batch) -> Dict[str, Any]:
+    if len(task_batch) == 0:
+        log: str = "No tasks to run."
+        return {"log": log}
+    out: Dict[str, Any] = {"log": f"Running batch of {len(task_batch)} tasks."}
+    results = await asyncio.gather(*task_batch, return_exceptions=True)
+    for result in results:
+        if isinstance(result, Exception):
+            continue
+        for name, value in result.items():
+            if name == "log":
+                out["log"] += result["log"]
+            else:
+                out[name] = value
+    return out
+
+
+@async_task(timeout=HPARAMS["timeout_find_file"])
+async def find_file(
+    name: str,
+    filename: str,
+    directory: str,
+    interval: float = HPARAMS["find_file_interval"],
+    open: bool = False,
+) -> Dict[str, Any]:
     while True:
         if filename in os.listdir(directory):
             full_path = os.path.join(directory, filename)
@@ -39,13 +68,13 @@ async def find_file(filename: str, directory: str, interval: float) -> Dict[str,
             file_age = time.time() - file_time
             return {
                 "log": f"Found {filename}, last modified {file_age} seconds ago.",
-                "full_path": full_path,
-                "file_age": file_age,
+                f"{name}_path": full_path,
+                f"{name}_age": file_age,
             }
         await asyncio.sleep(interval)
 
 
-@async_timeout(timeout=HPARAMS["timeout_send_file"])
+@async_task(timeout=HPARAMS["timeout_send_file"])
 async def send_file(
     filename: str,
     local_dir_path: str,
@@ -67,19 +96,3 @@ async def send_file(
         return {"log": f"Sent {filename} to {remote_ip}."}
     else:
         return {"log": f"Error sending {filename} to {remote_ip}: {stderr.decode()}"}
-
-
-def create_session_folder(
-    base_dir: str,
-    seed: int = HPARAMS["seed"],
-    folder_stem: str = HPARAMS["folder_stem"],
-    date_format: str = HPARAMS["date_format"],
-) -> str:
-    random.seed(seed)
-    session_id = str(uuid.UUID(int=random.getrandbits(128)))[:6]
-    current_date = datetime.now().strftime(date_format)
-    folder_name = f"{folder_stem}.{session_id}.{current_date}"
-    session_folder_path = os.path.join(base_dir, folder_name)
-    os.makedirs(session_folder_path, exist_ok=True)
-    print(f"Created session folder {session_folder_path} for random seed {seed}.")
-    return folder_name

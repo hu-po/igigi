@@ -4,14 +4,50 @@ from typing import Any, Dict
 import time
 
 from hparams import HPARAMS
-from utils import find_file, send_file, create_session_folder, async_timeout
+from utils import find_file, send_file, task_batch
 from record import take_image, record_video, CAMERAS
-from llm import run_llm
+from llm import run_llm, movement_action
 from servos import Servos
 from app import ChromeUI
 
 
-@async_timeout(timeout=HPARAMS["timeout_robot_main_loop"])
+def main_loop() -> Dict[str, Any]:
+    os.makedirs(HPARAMS["robot_data_dir"], exist_ok=True, clear=True)
+    # Robot is a singleton, requires state, start it in home position
+    servos = Servos()
+    ui = ChromeUI(
+        HPARAMS["robot_data_dir"],
+        HPARAMS["video_filename"],
+        HPARAMS["image_filename"],
+        HPARAMS["robotlog_filename"],
+    )
+    tasks = [
+        find_file("command", HPARAMS["command_filename"], HPARAMS["robot_data_dir"]),
+        movement_action("home", servos),
+        take_image(HPARAMS["cameras"]["stereo"]),
+    ]
+    while True:
+        state = asyncio.run(task_batch(tasks))
+        # Write logs to file
+        _path = os.path.join(HPARAMS["robot_data_dir"], HPARAMS["robotlog_filename"])
+        with open(_path, "a") as f:
+            f.write(state["log"])
+        # Reset tasks
+        tasks = []
+        # if commands are not in state stale, scrape for commands
+
+        # if image is stale, capture image
+
+        # if no capture image in tasks, record video
+
+        # if action, move servos
+
+        # if no action, move to home position
+
+        # if commands, call llm
+    
+
+@async_task(timeout=HPARAMS["timeout_robot_main_loop"])
 async def main_loop(servos: Servos, ui: ChromeUI) -> Dict[str, Any]:
     print("Starting main loop.")
     log: str = ""
@@ -135,23 +171,4 @@ async def main_loop(servos: Servos, ui: ChromeUI) -> Dict[str, Any]:
 
 
 if __name__ == "__main__":
-    HPARAMS["session_name"] = create_session_folder(HPARAMS["robot_data_dir"])
-    # Robot is a singleton, requires state, start it in home position
-    servos = Servos()
-    servos.move("home")
-    ui = ChromeUI(
-        os.path.join(HPARAMS["robot_data_dir"], HPARAMS["session_name"]),
-        HPARAMS.get("video_filename"),
-        HPARAMS.get("image_filename"),
-        HPARAMS.get("robotlog_filename"),
-    )
-    while True:
-        result = asyncio.run(main_loop(servos, ui))
-        print(result["log"])
-        output_path = os.path.join(
-            HPARAMS["robot_data_dir"],
-            HPARAMS["session_name"],
-            HPARAMS["robotlog_filename"],
-        )
-        with open(output_path, "w") as f:
-            f.write(result["log"])
+    robot_main_loop()

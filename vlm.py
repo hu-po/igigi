@@ -5,7 +5,7 @@ import base64
 from typing import Any, Dict
 
 from hparams import HPARAMS
-from utils import async_timeout
+from utils import async_task
 import requests
 
 class VLMDocker:
@@ -34,8 +34,16 @@ class VLMDocker:
         self.proc.terminate()
         self.nuke()
 
-@async_timeout(timeout=HPARAMS["timeout_run_vlm"])
-async def run_vlm(prompt: str, docker_url: str, image_filepath: str) -> Dict[str, Any]:
+@async_task(timeout=HPARAMS["timeout_run_vlm"])
+async def run_vlm(
+    prompt: str = HPARAMS["vlm_prompt"],
+    docker_url: str = HPARAMS["vlm_docker_url"],
+    image_filepath: str = os.path.join(
+        HPARAMS["brain_data_dir"],
+        HPARAMS["session_name"],
+        HPARAMS["image_filename"],
+    ),
+) -> Dict[str, Any]:
     with open(image_filepath, "rb") as img_file:
         response = requests.post(
             docker_url,

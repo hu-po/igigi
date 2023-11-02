@@ -1,110 +1,43 @@
 import asyncio
 import os
-from typing import Any, Dict
-import time
 
 from hparams import HPARAMS
-from utils import find_file, send_file, create_session_folder, async_timeout
+from utils import find_file, send_file, task_batch
 from vlm import VLMDocker, run_vlm
 
 
-@async_timeout(timeout=HPARAMS["timeout_brain_main_loop"])
-async def main_loop() -> Dict[str, Any]:
-    print("Starting main loop.")
-    log: str = ""
-    # Batch 1: get robot log, get mono image
-    task_batch = [
-        find_file(
-            HPARAMS["robotlog_filename"],
-            os.path.join(HPARAMS["brain_data_dir"], HPARAMS["session_name"]),
-            HPARAMS["find_file_interval"],
-        ),
-        find_file(
-            HPARAMS["image_filename"],
-            os.path.join(HPARAMS["brain_data_dir"], HPARAMS["session_name"]),
-            HPARAMS["find_file_interval"],
-        ),
-    ]
-    print(f"Run task_batch 1, {len(task_batch)} tasks.")
-    start_time = time.time()
-    results = await asyncio.gather(*task_batch, return_exceptions=True)
-    print(f"task_batch 1 took {time.time() - start_time} seconds.")
-    for result in results:
-        log += result["log"]
-    task_batch = []
-    # Executing VLM requires an image
-    if results[0].get("full_path", None) is None:
-        log += "No image found."
-    elif results[0]["file_age"] > HPARAMS["image_max_age"]:
-        log += "Image is too old."
-    else:
-        log += "Adding run_vlm to tasks."
-        task_batch.append(
-            run_vlm(
-                HPARAMS["vlm_prompt"],
-                HPARAMS["vlm_docker_url"],
-                os.path.join(
-                    HPARAMS["brain_data_dir"],
-                    HPARAMS["session_name"],
-                    HPARAMS["image_filename"],
-                ),
-            )
-        )
-    if len(task_batch) == 0:
-        return {"log": log}
-    print(f"Run task_batch 2, {len(task_batch)} tasks.")
-    start_time = time.time()
-    results = await asyncio.gather(*task_batch, return_exceptions=True)
-    print(f"task_batch 2 took {time.time() - start_time} seconds.")
-    for result in results:
-        log += result["log"]
-    task_batch = []
-    commands = results[0].get("reply", None)
-    print(f"VLM says: {commands}")
-    if commands is None:
-        log += "No commands from VLM."
-    else:
-        with open(
-            os.path.join(
+def brain_main_loop():
+    os.makedirs(HPARAMS["brain_data_dir"], exist_ok=True, clear=True)
+    docker = VLMDocker()
+    # startup tasks
+    tasks = [find_file("image", HPARAMS["image_filename"], HPARAMS["brain_data_dir"])]
+    while True:
+        state = asyncio.run(task_batch(tasks))
+        # Write logs to file
+        _path = os.path.join(HPARAMS["brain_data_dir"], HPARAMS["brainlog_filename"])
+        with open(_path, "a") as f:
+            f.write(state["log"])
+        # Reset tasks
+        tasks = []
+        # always check for image
+        tasks.append(find_file("image", HPARAMS["image_filename"], HPARAMS["brain_data_dir"]))
+        # if there is an image, run VLM
+        if state.get("image_path", None) is not None:
+            tasks.append(run_vlm())
+        # if there is a VLM output, write and send
+        if state.get("reply", None) is not None:
+            command_path = os.path.join(HPARAMS["brain_data_dir"], HPARAMS["commands_filename"])
+            with open(command_path, "w") as f:
+                f.write(state["reply"])
+            tasks.append(send_file(
+                HPARAMS["commands_filename"],
                 HPARAMS["brain_data_dir"],
-                HPARAMS["session_name"],
-                HPARAMS["commands_filename"],
-            ),
-            "w",
-        ) as f:
-            f.write(commands)
-        log += "Adding send_file to tasks."
-        task_batch.append(
-            send_file(
-                HPARAMS["commands_filename"],
-                os.path.join(HPARAMS["brain_data_dir"], HPARAMS["session_name"]),
-                os.path.join(HPARAMS["robot_data_dir"], HPARAMS["session_name"]),
+                HPARAMS["robot_data_dir"],
                 HPARAMS["robot_username"],
                 HPARAMS["robot_ip"],
-            ),
-        )
-    if len(task_batch) == 0:
-        return {"log": log}
-    print(f"Run task_batch 3, {len(task_batch)} tasks.")
-    start_time = time.time()
-    results = await asyncio.gather(*task_batch, return_exceptions=True)
-    print(f"task_batch 3 took {time.time() - start_time} seconds.")
-    for result in results:
-        log += result["log"]
-    return {"log": log}
+            ))
 
 
 if __name__ == "__main__":
-    HPARAMS["session_name"] = create_session_folder(HPARAMS["brain_data_dir"])
-    docker = VLMDocker()
-    while True:
-        result = asyncio.run(main_loop())
-        print(result["log"])
-        output_path = os.path.join(
-            HPARAMS["brain_data_dir"],
-            HPARAMS["session_name"],
-            HPARAMS["brainlog_filename"],
-        )
-        with open(output_path, "w") as f:
-            f.write(result["log"])
+    brain_main_loop()
 

@@ -6,11 +6,11 @@ from datetime import timedelta
 from typing import Any, Dict, List
 
 from hparams import HPARAMS, Pose, Move
-from utils import async_timeout
+from utils import async_task
 from servos import Servos
 
 
-@async_timeout(timeout=HPARAMS["timeout_move_servos"])
+@async_task(timeout=HPARAMS["timeout_move_servos"])
 async def run_llm(
     messages: List[Dict[str, str]],
     model: str = HPARAMS["robot_llm_model"],
