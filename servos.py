@@ -217,7 +217,7 @@ async def set_servos(
         ]
         out["log"] += f", waypoint={waypoint}"
         servos._write_position(waypoint)
-        time.sleep(sleep)
+        await asyncio.sleep(sleep)
     true_pos = servos._read_pos()
     out["log"] += f", true_pos={true_pos}"
     out["prev_pos"] = true_pos

@@ -1,23 +1,26 @@
 import os
 import asyncio
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
+
+# HACK: No explicit Coroutine type
+Coroutine = Any
 
 from hparams import HPARAMS
 
 
-async def time_it(task) -> Dict[str, Any]:
-    prefix = f"{HPARAMS['time_token']} started {task.name} at {time.time(HPARAMS['time_format'])}\n"
+async def time_it(name: str, task: Coroutine) -> Dict[str, Any]:
+    prefix = f"{HPARAMS['time_token']} started {name} at {time.time(HPARAMS['time_format'])}\n"
     print(prefix)
     start_time = time.time()
     result = await task
-    suffix = f"{HPARAMS['time_token']} finished {task.name} at {time.time(HPARAMS['time_format'])}, took {time.time() - start_time}s"
+    suffix = f"{HPARAMS['time_token']} finished {name} at {time.time(HPARAMS['time_format'])}, took {time.time() - start_time}s"
     print(suffix)
     result["log"] = f"{prefix}{result['log']}\n{suffix}"
     return time.time() - start_time
 
 
-async def task_batch(task_batch: List, node_name: str) -> Dict[str, Any]:
+async def task_batch(task_batch: List[Tuple[str, Coroutine]], node_name: str) -> Dict[str, Any]:
     node_token: str = HPARAMS[f"{node_name}_token"]
     if len(task_batch) == 0:
         log: str = f"{node_token} no tasks to run."
@@ -26,11 +29,10 @@ async def task_batch(task_batch: List, node_name: str) -> Dict[str, Any]:
     prefix: str = f"{node_token} started batch of {len(task_batch)} tasks\n"
     print(prefix)
     out: Dict[str, Any] = {"log": prefix}
-    results = await asyncio.gather(
-        *[time_it(task) for task in task_batch], return_exceptions=True)
+    results = await asyncio.gather(*[time_it(*_) for _ in task_batch], return_exceptions=True)
     for i, result in enumerate(results):
         if isinstance(result, Exception):
-            out["log"] += f"{node_token}{HPARAMS['fail_token']} {task_batch[i].name} failed with {result}\n"
+            out["log"] += f"{node_token}{HPARAMS['fail_token']} {task_batch[i][0]} failed with {result}\n"
             continue
         for name, value in result.items():
             if name == "log":
@@ -48,7 +50,7 @@ async def task_batch(task_batch: List, node_name: str) -> Dict[str, Any]:
 async def find_file(
     file_name: str,
     node_name: str,
-    interval: float = HPARAMS["find_file_interval"],
+    sleep: float = HPARAMS["find_file_sleep"],
     read: bool = False,
 ) -> Dict[str, Any]:
     filename: str = HPARAMS[f"{file_name}_filename"]
@@ -68,7 +70,7 @@ async def find_file(
                 with open(full_path, "r") as f:
                     out[file_name] = f.read()
             break
-        await asyncio.sleep(interval)
+        await asyncio.sleep(sleep)
     return out
 
 

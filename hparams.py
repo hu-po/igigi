@@ -149,7 +149,7 @@ HPARAMS["viewr_username"]: str = "ook"
 HPARAMS["viewr_data_dir"]: str = "/home/ook/dev/data/"
 
 # Misc
-HPARAMS["find_file_interval"]: float = 0.1
+HPARAMS["find_file_sleep"]: float = 0.1
 HPARAMS['time_format']: str = "%H:%M:%S"
 
 # Misc
