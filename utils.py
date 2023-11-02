@@ -14,9 +14,11 @@ async def time_it(task: Task) -> Dict[str, Any]:
     try:
         result = await asyncio.wait_for(task.coro, timeout=task.timeout)
     except asyncio.TimeoutError:
-        suffix: str = f"{HPARAMS['time_token']} {HPARAMS['fail_token']} timedout {task.name} at {time.strftime(HPARAMS['time_format'])}"
+        suffix: str = f"{HPARAMS['time_token']} {HPARAMS['fail_token']} timedout {task.name}"
+    except Exception as e:
+        suffix: str = f"{HPARAMS['time_token']} {HPARAMS['fail_token']} {task.name} failed with {str(e)}"
     else:
-        suffix: str = f"{HPARAMS['time_token']} finished {task.name} at {time.strftime(HPARAMS['time_format'])}"
+        suffix: str = f"{HPARAMS['time_token']} finished {task.name}"
     elapsed_time = time.time() - start_time
     suffix += f" took {elapsed_time:.2f}s"
     print(suffix)
