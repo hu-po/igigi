@@ -110,7 +110,7 @@ HPARAMS["brainlog_max_age"]: int = 120 # seconds
 HPARAMS["vlm_prompt"]: str = "Stereo left and right. Can I see the person? How should I move my head to find the person? Stereo POV camera."
 HPARAMS["vlm_docker_url"]: str = "http://localhost:5000/predictions"
 HPARAMS["vlmout_filename"]: str = "vlmout.txt"
-HPARAMS["timeout_run_vlm"]: str = 10 # seconds
+HPARAMS["brain_timeout_batch"]: str = 10 # seconds
 
 # Robot is the Raspberry Pi that controls the Servos, Cameras
 HPARAMS["robot_ip"]: str = "192.168.1.10"
@@ -122,18 +122,15 @@ HPARAMS["robot_llm_prompt"]: str = "Choose the best action based on the user des
 HPARAMS["robot_llm_model"]: str = "gpt-3.5-turbo"
 HPARAMS["robot_llm_temperature"]: float = 0.2
 HPARAMS["robot_llm_max_tokens"]: int = 24
-HPARAMS["timeout_run_llm"]: int = 2 # seconds
+HPARAMS["robot_timeout_batch"]: int = 2 # seconds
 # Image
 HPARAMS["image_filename"]: str = "image.png"
 HPARAMS["image_max_age"]: int = 100000
-HPARAMS["timeout_take_image"]: int = 2 # seconds
 # Video
 HPARAMS["video_filename"]: str = "video.mp4"
 HPARAMS["video_duration"]: int = 1 # seconds
 HPARAMS["video_fps"]: int = 30 # frames per second
-HPARAMS["timeout_record_video"]: int = 10 # seconds
 # Movement parameters
-HPARAMS["timeout_set_servos"]: int = 2 # seconds
 HPARAMS["default_pose"]: str = "forward"
 HPARAMS["set_servo_speed"]: int = 32 # degrees per move duration
 HPARAMS["set_servo_duration"]: float = 1.6 # seconds
@@ -154,9 +151,7 @@ HPARAMS["viewr_username"]: str = "ook"
 HPARAMS["viewr_data_dir"]: str = "/home/ook/dev/data/"
 
 # Misc
-HPARAMS["timeout_find_file"]: float = 1
 HPARAMS["find_file_interval"]: float = 0.1
-HPARAMS["timeout_send_file"]: float = 1
 HPARAMS['time_format']: str = "%H:%M:%S"
 
 # Misc
