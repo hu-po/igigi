@@ -59,7 +59,7 @@ async def find_file(
     filename: str,
     directory: str,
     interval: float = HPARAMS["find_file_interval"],
-    open: bool = False,
+    read: bool = False,
 ) -> Dict[str, Any]:
     while True:
         if filename in os.listdir(directory):
@@ -69,7 +69,7 @@ async def find_file(
             file_age = time.time() - file_time
             out[f"{retkey}_path"] = full_path
             out[f"{retkey}_age"] = file_age
-            if open:
+            if read:
                 with open(full_path, "r") as f:
                     out[retkey] = f.read()
             return out

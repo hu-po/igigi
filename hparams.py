@@ -55,7 +55,7 @@ HPARAMS: Dict[str, Any] = {
     # Communication
     "timeout_find_file": 2,
     "find_file_interval": 0.1,
-    "timeout_send_file": 10,
+    "timeout_send_file": 2,
     # Robot
     "robot_data_dir": "/home/pi/dev/data/",
     "robot_ip": "192.168.1.10",
