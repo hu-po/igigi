@@ -49,12 +49,22 @@ async def main_loop(servos: Servos, ui: ChromeUI) -> Dict[str, Any]:
         log += "Adding move_servos to tasks."
         with open(results[0]["full_path"], "r") as f:
             commands = f.read()
+        # Add moves and poses to commands
+        prompt: str = HPARAMS["robot_llm_system_prompt"]
+        for move in HPARAMS["moves"].values():
+            prompt += f"{move.name}: {move.desc}\n"
+        for pose in HPARAMS["poses"].values():
+            prompt += f"{pose.name}: {pose.desc}\n"
+        messages = [
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": commands},
+        ]
+        log += f"SYSTEM: {prompt}"
+        log += f"USER: {commands}"
         print(f"Commands: {commands}")
         task_batch.append(
             run_llm(
-                servos,
-                HPARAMS["robot_llm_system_prompt"],
-                commands,
+                messages,
                 HPARAMS["robot_llm_model"],
                 HPARAMS["robot_llm_temperature"],
                 HPARAMS["robot_llm_max_tokens"],
