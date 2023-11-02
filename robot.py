@@ -38,22 +38,8 @@ def _loop():
         tasks.append(take_image(HPARAMS["cameras"]["stereo"]))
         # if image, send it to brain
         if state.get("image_output_path", None) is not None:
-            tasks.append(send_file(
-                HPARAMS["image_filename"],
-                HPARAMS["robot_data_dir"],
-                HPARAMS["brain_data_dir"],
-                HPARAMS["brain_username"],
-                HPARAMS["brain_ip"],
-            ))
-        # # if video, send it to viewr
-        # if state.get("video_output_path", None) is not None:
-        #     tasks.append(send_file(
-        #         HPARAMS["image_filename"],
-        #         HPARAMS["robot_data_dir"],
-        #         HPARAMS["viewr_data_dir"],
-        #         HPARAMS["viewr_ip"],
-        #         HPARAMS["viewr_username"],
-        #     ))
+            tasks.append(send_file(HPARAMS["image_filename"], "robot", "brain"))
+        # TODO: if video, send it to viewr
         # if vlmouts, call llm
         if state.get("vlmout", None) is not None:
             # Add moves and poses to vlmouts

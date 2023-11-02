@@ -57,44 +57,53 @@ async def task_batch(task_batch) -> Dict[str, Any]:
 async def find_file(
     retkey: str,
     filename: str,
-    directory: str,
+    node_name: str,
     interval: float = HPARAMS["find_file_interval"],
     read: bool = False,
 ) -> Dict[str, Any]:
+    directory: str = HPARAMS[f"{node_name}_data_dir"]
+    node_token: str = HPARAMS[f"{node_name}_token"]
+    out: Dict[str, Any] = {"log": f"{HPARAMS['find_token']} looking for {filename} in {node_token}"}
     while True:
         if filename in os.listdir(directory):
-            out: Dict[str, Any] = {"log": f"Found {filename}."}
+            out["log"] += "... found"
             full_path = os.path.join(directory, filename)
             file_time = os.path.getmtime(full_path)
             file_age = time.time() - file_time
+            out["log"] += f" last modified {file_age}s ago"
             out[f"{retkey}_path"] = full_path
             out[f"{retkey}_age"] = file_age
             if read:
                 with open(full_path, "r") as f:
                     out[retkey] = f.read()
-            return out
+            break
         await asyncio.sleep(interval)
+    out["log"] += "\n"
+    return out
 
 
 @async_task(timeout=HPARAMS["timeout_send_file"])
 async def send_file(
     filename: str,
-    local_dir_path: str,
-    remote_dir_path: str,
-    remote_username: str,
-    remote_ip: str,
+    local_name: str = HPARAMS["robot_username"],
+    remote_name: str = HPARAMS["brain_username"],
 ) -> dict:
-    out: dict = {"log": f"Sending {filename}."}
+    local_dir_path: str = HPARAMS[f"{local_name}_data_dir"]
+    remote_dir_path: str = HPARAMS[f"{remote_name}_data_dir"]
+    remote_username: str = HPARAMS[f"{remote_name}_username"]
+    remote_ip: str = HPARAMS[f"{remote_name}_ip"]
+    local_token = HPARAMS[f"{local_name}_token"]
+    remote_token = HPARAMS[f"{remote_name}_token"]
+    out: dict = {"log": f"{HPARAMS['send_token']} sending {filename} from {local_token} to {remote_token}"}
     cmd = [
         "/usr/bin/scp",
         os.path.join(local_dir_path, filename),
         f"{remote_username}@{remote_ip}:{os.path.join(remote_dir_path, filename)}",
     ]
     result = os.system(" ".join(cmd))
-    if result == 0:
-        out["log"] += f"Successfully sent {filename} to {remote_ip}"
-    else:
-        out["log"] += f"Failed to send {filename} to {remote_ip}"
+    if result != 0:
+        out["log"] += "... failed"
+    out["log"] += "\n"
     return out
 
 
@@ -104,8 +113,9 @@ async def write_log(
     filename: str,
     directory: str,
 ) -> Dict[str, Any]:
-    out: Dict[str, Any] = {"log": f"{HPARAMS['log']} Saving logs to {filename}."}
+    out: Dict[str, Any] = {"log": f"{HPARAMS['save_token']} saving logs {filename}"}
     full_path = os.path.join(directory, filename)
     with open(full_path, "a") as f:
         f.write(log)
+    out["log"] += "\n"
     return out

@@ -14,6 +14,8 @@ HPARAMS: Dict[str, Any] = {
     "viewr_token": "🖼️",
     "image_token": "📷",
     "video_token": "📹",
+    "find_token" : "🔍",
+    "send_token" : "📤",
     "timer_token": "⏱️",
     "user_token": "👤",
     "servos_token": "🦾",
@@ -131,9 +133,10 @@ HPARAMS["video_fps"]: int = 30 # frames per second
 HPARAMS["timeout_record_video"]: int = 10 # seconds
 # Movement parameters
 HPARAMS["timeout_set_servos"]: int = 2 # seconds
+HPARAMS["default_pose"]: str = "forward"
 HPARAMS["set_servo_speed"]: int = 32 # degrees per move duration
 HPARAMS["set_servo_duration"]: float = 1.6 # seconds
-HPARAMS["set_servo_interval"]: float = 0.001 # seconds
+HPARAMS["set_servo_sleep"]: float = 0.001 # seconds
 # Raw servo parameters
 HPARAMS["protocol_version"]: float = 2.0
 HPARAMS["baudrate"]: int = 57600

@@ -45,13 +45,7 @@ def _loop():
             # TODO: check if path exists, if it is abve a certain size, delete it
             with open(_path, "w") as f:
                 f.write(state["reply"])
-            tasks.append(send_file(
-                HPARAMS["vlmout_filename"],
-                HPARAMS["brain_data_dir"],
-                HPARAMS["robot_data_dir"],
-                HPARAMS["robot_username"],
-                HPARAMS["robot_ip"],
-            ))
+            tasks.append(send_file(HPARAMS["vlmout_filename"], "brain", "robot"))
 
 
 if __name__ == "__main__":
