@@ -46,19 +46,19 @@ async def movement_action(
     desired_pose = pose_dict.get(action, None)
     if desired_pose is not None:
         log += "is a Pose."
-        goal_position = desired_pose.angles
+        goal_pos = desired_pose.angles
     else:
         desired_move = move_dict.get(action, None)
         if desired_move is not None:
             log += "is a Move."
             move_vector = [x * speed for x in desired_move.vector]
             log += f"Move vector is {move_vector}."
-            true_position = servos._read_pos()
-            goal_position = [move_vector[i] + true_position[i] for i in range(len(move_vector))]
+            true_pos = servos._read_pos()
+            goal_pos = [move_vector[i] + true_pos[i] for i in range(len(move_vector))]
         else:
             log += "is not valid. Moving to home position."
-            goal_position = pose_dict["home"].angles
-    log += f"Goal position is {goal_position}."
+            goal_pos = pose_dict["home"].angles
+    log += f"Goal position is {goal_pos}."
     # Move to the goal position over timeout seconds
     duration: timedelta = timedelta(seconds=duration)
     start_time = time.time()
@@ -67,16 +67,16 @@ async def movement_action(
         if elapsed_time > duration.total_seconds():
             log += f"Action finished after {elapsed_time} seconds."
             break
+        true_positions = servos._read_pos()
         # Interpolate between the current position and the goal position
         # based on the fraction of time elapsed
         fraction = elapsed_time / duration.total_seconds()
         interpolated_position = [
-            int((goal_position[i] - true_position[i]) * fraction + true_position[i])
-            for i in range(len(goal_position))
+            int((goal_pos[i] - true_pos[i]) * fraction + true_pos[i])
+            for i in range(len(goal_pos))
         ]
         servos._write_position(interpolated_position)
-        true_positions = servos._read_pos()
-        distance_to_target: int = sum(abs(true_positions[i] - goal_position[i]) for i in range(len(goal_position)))
+        distance_to_target: int = sum(abs(true_positions[i] - goal_pos[i]) for i in range(len(goal_pos)))
         log += f"Distance to target is {distance_to_target}."
         time.sleep(interval)
     true_positions = servos._read_pos()

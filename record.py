@@ -44,7 +44,7 @@ async def record_video(
         }
     else:
         return {
-            "log": f"Video from {camera.name} saved to {filename}. Duration: {duration} seconds. Size {camera.width}x{camera.height} at {fps} fps.",
+            "log": f"Video from saved to {filename}. Duration: {duration} seconds. Size {camera.width}x{camera.height} at {fps} fps.",
             "video_output_path": output_path,
         }
 
@@ -80,7 +80,7 @@ async def take_image(
         }
     else:
         return {
-            "log": f"Image from {camera.name} saved to {filename}. Size {camera.width}x{camera.height}.",
+            "log": f"Image from saved to {filename}. Size {camera.width}x{camera.height}.",
             "image_output_path": output_path,
         }
 
