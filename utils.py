@@ -2,58 +2,51 @@ import os
 import asyncio
 from asyncio import Task
 import time
-from pprint import pprint
-from typing import Callable, Any, Dict, List
+from typing import Any, Dict, List
 
 from hparams import HPARAMS
 
 
-def async_task():
-    def decorator(func: Callable) -> Callable:
-        async def wrapper(*args: Any, **kwargs: Any) -> Dict[str, Any]:
-            try:
-                out: Dict[str, Any] = {"log": f"Calling {func.__name__}."}
-                print(out["log"])
-                start_time = time.time()
-                result = await asyncio.wait_for(func(*args, **kwargs), timeout=timeout)
-                duration = time.time() - start_time
-                out["log"] += f"Completed after {duration} seconds."
-                print(out["log"])
-                for name, value in result.items():
-                    if name == "log":
-                        out["log"] += result["log"]
-                    else:
-                        out[name] = value
-            except asyncio.TimeoutError:
-                out["log"] += f"Timeout after {timeout} seconds."
-            except Exception as e:
-                out["log"] += f"Exception {e}"
-            return out
+async def time_it(task: Task) -> Dict[str, Any]:
+    prefix = f"{HPARAMS['time_token']} started {task.get_name()} at {time.time(HPARAMS['time_format'])}\n"
+    print(prefix)
+    start_time = time.time()
+    result = await task
+    suffix = f"{HPARAMS['time_token']} finished {task.get_name()} at {time.time(HPARAMS['time_format'])}, took {time.time() - start_time}s")
+    print(suffix)
+    result["log"] = f"{prefix}{result['log']}\n{suffix}"
+    return time.time() - start_time
 
-        return wrapper
 
-    return decorator
-
-async def task_batch(task_batch: List[Task], timeout: int) -> Dict[str, Any]:
-    print("\n\nNew Task Batch")
+async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
+    timeout: float = HPARAMS[f"{node_name}_timeout_batch"]
+    node_token: str = HPARAMS[f"{node_name}_token"]
     if len(task_batch) == 0:
-        log: str = "No tasks to run."
+        log: str = f"{node_token} no tasks to run."
+        print(log)
         return {"log": log}
-    out: Dict[str, Any] = {"log": f"Running batch of {len(task_batch)} tasks."}
-    results = await asyncio.gather(*task_batch, return_exceptions=True, timeout=timeout)
-    for result in results:
+    prefix: str = f"{node_token} started batch of {len(task_batch)} tasks\n"
+    print(prefix)
+    out: Dict[str, Any] = {"log": prefix}
+    results = await asyncio.gather(
+        *[time_it(task) for task in task_batch], return_exceptions=True, timeout=timeout)
+    for i, result in enumerate(results):
         if isinstance(result, Exception):
+            out["log"] += f"{node_token}{HPARAMS['fail_token']} {task_batch[i].get_name()} failed with {result}\n"
             continue
         for name, value in result.items():
             if name == "log":
-                out["log"] += result["log"]
+                log = f"{result['log']}\n"
+                print(log)
+                out["log"] += log
             else:
                 out[name] = value
-    pprint(out)
+    suffix: str = f"{node_token} finished batch of {len(task_batch)} tasks\n"
+    print(suffix)
+    out["log"] += suffix
     return out
 
 
-@async_task(timeout=HPARAMS["timeout_find_file"])
 async def find_file(
     retkey: str,
     filename: str,
@@ -81,7 +74,6 @@ async def find_file(
     return out
 
 
-@async_task(timeout=HPARAMS["timeout_send_file"])
 async def send_file(
     filename: str,
     local_name: str = HPARAMS["robot_username"],
@@ -105,7 +97,6 @@ async def send_file(
     return out
 
 
-@async_task(timeout=HPARAMS["timeout_write_log"])
 async def write_log(
     log: str,
     filename: str,

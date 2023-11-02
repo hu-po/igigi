@@ -4,9 +4,7 @@ import cv2
 from typing import Any, Dict
 
 from hparams import HPARAMS, Camera
-from utils import async_task
 
-@async_task(timeout=HPARAMS["timeout_record_video"])
 async def record_video(
     camera: Camera,
     filename: str = HPARAMS["video_filename"],
@@ -42,7 +40,6 @@ async def record_video(
         "video_output_path": output_path,
     }
 
-@async_task(timeout=HPARAMS["timeout_take_image"])
 async def take_image(
     camera: Camera,
     filename: str = HPARAMS["image_filename"],

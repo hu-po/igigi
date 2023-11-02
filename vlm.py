@@ -5,7 +5,6 @@ import base64
 from typing import Any, Dict
 
 from hparams import HPARAMS
-from utils import async_task
 import requests
 
 class VLMDocker:
@@ -34,12 +33,12 @@ class VLMDocker:
         self.proc.terminate()
         self.nuke()
 
-@async_task(timeout=HPARAMS["timeout_run_vlm"])
 async def run_vlm(
     prompt: str = HPARAMS["vlm_prompt"],
     docker_url: str = HPARAMS["vlm_docker_url"],
     image_filepath: str = os.path.join(HPARAMS["brain_data_dir"], HPARAMS["image_filename"]),
 ) -> Dict[str, Any]:
+    log: str = f"{HPARAMS['vlm_token']} VLM using PROMPT: {prompt}"
     with open(image_filepath, "rb") as img_file:
         response = requests.post(
             docker_url,
@@ -51,9 +50,6 @@ async def run_vlm(
                 },
             },
         )
-        reply = ''.join(response.json()["output"])
-        print(f"\n\nVLM OUTPUT: {reply}\n\n")
-        return {
-            "log": f"Ran VLM with prompt {prompt} and image {image_filepath}.",
-            "reply": reply, #''.join(response.json()["output"]),
-        }
+    reply = ''.join(response.json()["output"])
+    log += f" REPLY: {reply}"
+    return {"log": log, "reply": reply}

@@ -4,7 +4,6 @@ import time
 from datetime import timedelta
 
 from hparams import HPARAMS, Servo, Pose, Move
-from utils import async_task
 
 from dynamixel_sdk import (
     PortHandler,
@@ -172,7 +171,6 @@ class Servos:
         self.port_handler.closePort()
 
 
-@async_task(timeout=HPARAMS["timeout_set_servos"])
 async def set_servos(
     action: str,
     servos: Servos,

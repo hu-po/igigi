@@ -15,8 +15,9 @@ HPARAMS: Dict[str, Any] = {
     "image_token": "📷",
     "video_token": "📹",
     "find_token" : "🔍",
+    "fail_token" : "❌",
     "send_token" : "📤",
-    "timer_token": "⏱️",
+    "time_token": "⏱️",
     "user_token": "👤",
     "servos_token": "🦾",
     "move_token": "🦿",
@@ -156,6 +157,7 @@ HPARAMS["viewr_data_dir"]: str = "/home/ook/dev/data/"
 HPARAMS["timeout_find_file"]: float = 1
 HPARAMS["find_file_interval"]: float = 0.1
 HPARAMS["timeout_send_file"]: float = 1
+HPARAMS['time_format']: str = "%H:%M:%S"
 
 # Misc
 HPARAMS["seed"]: int = 42

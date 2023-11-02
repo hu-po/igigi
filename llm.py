@@ -20,9 +20,5 @@ async def run_llm(
         max_tokens=max_tokens,
     )
     reply: str = response.choices[0].message.content
-    print(f"\n\nLLM OUTPUT: {reply}\n\n")
     log += f"LLM: {reply}"
-    return {
-        "log": log,
-        "reply": reply,
-    }
+    return {"log": log, "reply": reply}
