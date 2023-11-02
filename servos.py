@@ -255,4 +255,5 @@ def limp_mode() -> None:
 
 
 if __name__ == "__main__":
-    limp_mode()
+    test_servos()
+    # limp_mode()

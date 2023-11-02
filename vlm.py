@@ -51,7 +51,9 @@ async def run_vlm(
                 },
             },
         )
+        reply = ''.join(response.json()["output"])
+        print(f"VLM OUTPUT: {reply}")
         return {
             "log": f"Ran VLM with prompt {prompt} and image {image_filepath}.",
-            "reply": ''.join(response.json()["output"]),
+            "reply": reply, #''.join(response.json()["output"]),
         }

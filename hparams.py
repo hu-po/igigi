@@ -51,7 +51,7 @@ HPARAMS: Dict[str, Any] = {
     "vlm_docker_url": "http://localhost:5000/predictions",
     "rawaction_filename": "rawaction.txt",
     "rawaction_max_age": 100000,
-    "timeout_run_vlm": 2,
+    "timeout_run_vlm": 10,
     # Communication
     "timeout_find_file": 2,
     "find_file_interval": 0.1,
