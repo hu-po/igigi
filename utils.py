@@ -19,7 +19,6 @@ async def time_it(task: Task) -> Dict[str, Any]:
 
 
 async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
-    timeout: float = HPARAMS[f"{node_name}_timeout_batch"]
     node_token: str = HPARAMS[f"{node_name}_token"]
     if len(task_batch) == 0:
         log: str = f"{node_token} no tasks to run."
@@ -29,7 +28,7 @@ async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
     print(prefix)
     out: Dict[str, Any] = {"log": prefix}
     results = await asyncio.gather(
-        *[time_it(task) for task in task_batch], return_exceptions=True, timeout=timeout)
+        *[time_it(task) for task in task_batch], return_exceptions=True)
     for i, result in enumerate(results):
         if isinstance(result, Exception):
             out["log"] += f"{node_token}{HPARAMS['fail_token']} {task_batch[i].get_name()} failed with {result}\n"

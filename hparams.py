@@ -70,9 +70,9 @@ class Move:
 
 HPARAMS["moves"] = {
     HPARAMS["up_token"] : Move([0, 1, 0], "look up, move slightly upwards"),
-    HPARAMS["left_token"] : Move([0, 0, -1], "look left, move slightly leftwards"),
+    HPARAMS["left_token"] : Move([0, 0, 1], "look left, move slightly leftwards"),
     HPARAMS["down_token"] : Move([0, -1, 0], "look down, move slightly downwards"),
-    HPARAMS["right_token"] : Move([0, 0, 1], "look right, move slightly rightwards"),
+    HPARAMS["right_token"] : Move([0, 0, -1], "look right, move slightly rightwards"),
     #     "tilt_left": Move([-1, 0, 0], "roll or tilt head to the left"),
     #     "tilt_right": Move([1, 0, 0], "roll or tilt head to the right"),
 }
@@ -110,7 +110,6 @@ HPARAMS["brainlog_max_age"]: int = 120 # seconds
 HPARAMS["vlm_prompt"]: str = "Stereo left and right. Can I see the person? How should I move my head to find the person? Stereo POV camera."
 HPARAMS["vlm_docker_url"]: str = "http://localhost:5000/predictions"
 HPARAMS["vlmout_filename"]: str = "vlmout.txt"
-HPARAMS["brain_timeout_batch"]: str = 10 # seconds
 
 # Robot is the Raspberry Pi that controls the Servos, Cameras
 HPARAMS["robot_ip"]: str = "192.168.1.10"
@@ -122,7 +121,6 @@ HPARAMS["robot_llm_prompt"]: str = "Choose the best action based on the user des
 HPARAMS["robot_llm_model"]: str = "gpt-3.5-turbo"
 HPARAMS["robot_llm_temperature"]: float = 0.2
 HPARAMS["robot_llm_max_tokens"]: int = 24
-HPARAMS["robot_timeout_batch"]: int = 2 # seconds
 # Image
 HPARAMS["image_filename"]: str = "image.png"
 HPARAMS["image_max_age"]: int = 100000
