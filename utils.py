@@ -64,11 +64,11 @@ async def find_file(
             file_time = os.path.getmtime(full_path)
             file_age = time.time() - file_time
             out["log"] += f" last modified {file_age}s ago"
-            out[f"{retkey}_path"] = full_path
-            out[f"{retkey}_age"] = file_age
+            out[f"{file_name}_path"] = full_path
+            out[f"{file_name}_age"] = file_age
             if read:
                 with open(full_path, "r") as f:
-                    out[retkey] = f.read()
+                    out[file_name] = f.read()
             break
         await asyncio.sleep(interval)
     return out

@@ -69,10 +69,10 @@ class Move:
 
 
 HPARAMS["moves"] = {
-    HPARAMS["up_token"] : Move([0, -1, 0], "look up, move slightly upwards"),
-    HPARAMS["down_token"] : Move([0, 1, 0], "look down, move slightly downwards"),
-    HPARAMS["left_token"] : Move([0, 0, 1], "look left, move slightly leftwards"),
-    HPARAMS["right_token"] : Move([0, 0, -1], "look right, move slightly rightwards"),
+    HPARAMS["up_token"] : Move([0, 1, 0], "look up, move slightly upwards"),
+    HPARAMS["left_token"] : Move([0, 0, -1], "look left, move slightly leftwards"),
+    HPARAMS["down_token"] : Move([0, -1, 0], "look down, move slightly downwards"),
+    HPARAMS["right_token"] : Move([0, 0, 1], "look right, move slightly rightwards"),
     #     "tilt_left": Move([-1, 0, 0], "roll or tilt head to the left"),
     #     "tilt_right": Move([1, 0, 0], "roll or tilt head to the right"),
 }
