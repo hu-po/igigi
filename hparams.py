@@ -49,7 +49,7 @@ HPARAMS: Dict[str, Any] = {
     # VLM (Brain)
     "vlm_prompt": "Is there a person in this image? Where are they? On the left? right? center? What direction should we move the camera to get a better view of them?",
     "vlm_docker_url": "http://localhost:5000/predictions",
-    "commands_filename": "command.txt",
+    "rawaction_filename": "command.txt",
     "commands_max_age": 100000,
     "timeout_run_vlm": 2,
     # Communication

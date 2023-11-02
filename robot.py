@@ -17,7 +17,7 @@ def _loop():
     servos = Servos()
     # ui = ChromeUI()
     tasks = [
-        find_file("command", HPARAMS["command_filename"], HPARAMS["robot_data_dir"], open=True),
+        find_file("command", HPARAMS["rawaction_filename"], HPARAMS["robot_data_dir"], open=True),
         movement_action("home", servos),
         take_image(HPARAMS["cameras"]["stereo"]),
     ]
@@ -64,7 +64,7 @@ def _loop():
             tasks.append(run_llm(messages))
         else:
             # try and find commands if no command
-            tasks.append(find_file("command", HPARAMS["command_filename"], HPARAMS["robot_data_dir"], open=True))
+            tasks.append(find_file("command", HPARAMS["rawaction_filename"], HPARAMS["robot_data_dir"], open=True))
         # always move
         if state.get("action", None) is not None:
             # if action, move servos
