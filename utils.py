@@ -49,7 +49,7 @@ async def task_batch(task_batch) -> Dict[str, Any]:
                 out["log"] += result["log"]
             else:
                 out[name] = value
-    pprint(out["log"])
+    pprint(out)
     return out
 
 

@@ -67,7 +67,7 @@ HPARAMS: Dict[str, Any] = {
     "robot_llm_model": "gpt-3.5-turbo",
     "robot_llm_temperature": 0.2,
     "robot_llm_max_tokens": 32,
-    "timeout_run_llm": 2,
+    "timeout_run_llm": 4,
     # Visualization
     "vizzy_data_dir": "/home/ook/dev/data/",
     "vizzy_ip": "192.168.1.10",

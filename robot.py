@@ -67,7 +67,7 @@ def _loop():
             # try and find rawactions if no rawaction
             tasks.append(find_file("rawaction", HPARAMS["rawaction_filename"], HPARAMS["robot_data_dir"], open=True))
         # always move
-        if state.get("action", None) is not None:
+        if state.get("reply", None) is not None:
             # if action, move servos
             tasks.append(servo_action(state["action"], servos))
         else:

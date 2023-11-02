@@ -1,7 +1,7 @@
 import openai
 from typing import Any, Dict, List
 
-from hparams import HPARAMS, Pose, Move
+from hparams import HPARAMS
 from utils import async_task
 
 
