@@ -16,8 +16,8 @@ def _loop():
     # Robot is a singleton, requires state
     servos = Servos()
     tasks = [
-        Task("find_file", find_file("vlmout", HPARAMS["robot_data_dir"], read=True)),
-        Task("find_file", find_file("robotlog", HPARAMS["robot_data_dir"], read=True)),
+        Task("find_file", find_file("vlmout", "robot", read=True)),
+        Task("find_file", find_file("robotlog", "robot", read=True)),
         Task("set_servos", set_servos("forward", servos)),
         Task("take_image", take_image(HPARAMS["cameras"]["stereo"])),
     ]
@@ -29,12 +29,12 @@ def _loop():
         if state.get("robotlog_age", 0) > HPARAMS["robotlog_max_age"]:
             tasks.append(Task("write_log", write_log(state["log"], "robot")))
         # always check for brainlog
-        tasks.append(Task("find_file", find_file("robotlog", HPARAMS["brain_data_dir"], read=True)))
+        tasks.append(Task("find_file", find_file("robotlog", "robot", read=True)))
         # always capture image
         tasks.append(Task("take_image", take_image(HPARAMS["cameras"]["stereo"])))
         # if image, send it to brain
         if state.get("image_output_path", None) is not None:
-            tasks.append(Task("send_file", send_file(HPARAMS["image_filename"], "robot", "brain")))
+            tasks.append(Task("send_file", send_file("image", "robot", "brain")))
         # TODO: if video, send it to viewr
         # if vlmouts, call llm
         if state.get("vlmout", None) is not None:
@@ -51,7 +51,7 @@ def _loop():
             tasks.append(Task("run_llm", run_llm(messages)))
         else:
             # try and find vlmouts if no vlmout
-            tasks.append(Task("find_file", find_file("vlmout", HPARAMS["robot_data_dir"], read=True)))
+            tasks.append(Task("find_file", find_file("vlmout", "robot", read=True)))
         # always move
         if state.get("reply", None) is not None:
             # if action, move servos

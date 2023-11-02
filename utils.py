@@ -77,10 +77,11 @@ async def find_file(
 
 
 async def send_file(
-    filename: str,
+    file_name: str,
     local_name: str = HPARAMS["robot_username"],
     remote_name: str = HPARAMS["brain_username"],
 ) -> dict:
+    filename: str = HPARAMS[f"{file_name}_filename"]
     local_dir_path: str = HPARAMS[f"{local_name}_data_dir"]
     remote_dir_path: str = HPARAMS[f"{remote_name}_data_dir"]
     remote_username: str = HPARAMS[f"{remote_name}_username"]
