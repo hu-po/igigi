@@ -1,13 +1,14 @@
 import os
 import asyncio
+from asyncio import Task
 import time
 from pprint import pprint
-from typing import Callable, Any, Dict
+from typing import Callable, Any, Dict, List
 
 from hparams import HPARAMS
 
 
-def async_task(timeout: int):
+def async_task():
     def decorator(func: Callable) -> Callable:
         async def wrapper(*args: Any, **kwargs: Any) -> Dict[str, Any]:
             try:
@@ -33,14 +34,13 @@ def async_task(timeout: int):
 
     return decorator
 
-
-async def task_batch(task_batch) -> Dict[str, Any]:
+async def task_batch(task_batch: List[Task], timeout: int) -> Dict[str, Any]:
     print("\n\nNew Task Batch")
     if len(task_batch) == 0:
         log: str = "No tasks to run."
         return {"log": log}
     out: Dict[str, Any] = {"log": f"Running batch of {len(task_batch)} tasks."}
-    results = await asyncio.gather(*task_batch, return_exceptions=True)
+    results = await asyncio.gather(*task_batch, return_exceptions=True, timeout=timeout)
     for result in results:
         if isinstance(result, Exception):
             continue
@@ -78,7 +78,6 @@ async def find_file(
                     out[retkey] = f.read()
             break
         await asyncio.sleep(interval)
-    out["log"] += "\n"
     return out
 
 
@@ -103,7 +102,6 @@ async def send_file(
     result = os.system(" ".join(cmd))
     if result != 0:
         out["log"] += "... failed"
-    out["log"] += "\n"
     return out
 
 
@@ -117,5 +115,4 @@ async def write_log(
     full_path = os.path.join(directory, filename)
     with open(full_path, "a") as f:
         f.write(log)
-    out["log"] += "\n"
     return out
