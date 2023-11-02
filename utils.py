@@ -85,9 +85,10 @@ async def send_file(
     remote_username: str,
     remote_ip: str,
 ) -> Dict[str, Any]:
+    out: Dict[str, Any] = {"log" : f"Sending {filename}."}
     process = await asyncio.create_subprocess_exec(
         *[
-            "scp",
+            "/usr/bin/scp",
             os.path.join(local_dir_path, filename),
             f"{remote_username}@{remote_ip}:{os.path.join(remote_dir_path, filename)}",
         ],
@@ -96,6 +97,7 @@ async def send_file(
     )
     _, stderr = await process.communicate()
     if process.returncode == 0:
-        return {"log": f"Sent {filename} to {remote_ip}."}
+        out["log"] += f"Sent {filename} to {remote_ip}."
     else:
-        return {"log": f"Error sending {filename} to {remote_ip}: {stderr.decode()}"}
+        out["log"] += f"Error sending {filename} to {remote_ip}: {stderr.decode()}"
+    return out

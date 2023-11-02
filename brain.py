@@ -8,8 +8,8 @@ from vlm import VLMDocker, run_vlm
 
 
 def _loop():
-    if os.path.exists(HPARAMS["robot_data_dir"]):
-        shutil.rmtree(HPARAMS["robot_data_dir"])
+    if os.path.exists(HPARAMS["brain_data_dir"]):
+        shutil.rmtree(HPARAMS["brain_data_dir"])
     os.makedirs(HPARAMS["brain_data_dir"], exist_ok=True)
     _ = VLMDocker()
     # startup tasks
