@@ -97,6 +97,16 @@ HPARAMS["cameras"] = {
     #     desc="front facing monocular camera, forehead",
     # )
 }
+# custom clipping, dimmension is final size, centerpoints are (x,y) of normalized center of crop
+HPARAMS["stereo_focus"] = [
+    [640,480], # dimensions
+    [320,240], # center point left
+    [960,240], # center points right
+]
+HPARAMS["image_filename"]: str = "image.png"
+HPARAMS["video_filename"]: str = "video.mp4"
+HPARAMS["video_duration"]: int = 1 # seconds
+HPARAMS["video_fps"]: int = 30 # frames per second
 
 # HACK: No explicit Coroutine type
 Coroutine = Any
@@ -130,13 +140,6 @@ HPARAMS["robot_llm_temperature"]: float = 0.2
 HPARAMS["robot_llm_max_tokens"]: int = 8
 HPARAMS["robot_llm_timeout"]: int = 4 # seconds
 
-# Image
-HPARAMS["image_filename"]: str = "image.png"
-HPARAMS["image_max_age"]: int = 100000
-# Video
-HPARAMS["video_filename"]: str = "video.mp4"
-HPARAMS["video_duration"]: int = 1 # seconds
-HPARAMS["video_fps"]: int = 30 # frames per second
 # Movement parameters
 HPARAMS["default_pose"]: str = HPARAMS["home_token"]
 HPARAMS["set_servo_speed"]: int = 32 # degrees per move duration
