@@ -52,4 +52,5 @@ async def run_vlm(
         )
     reply = ''.join(response.json()["output"])
     log += f" REPLY: {reply}"
+    print(f"\n{HPARAMS['vlm_token']} {log}\n")
     return {"log": log, "reply": reply}

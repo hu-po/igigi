@@ -23,12 +23,11 @@ HPARAMS: Dict[str, Any] = {
     "servos_token": "🦾",
     "move_token": "🦿",
     "save_token": "💾",
-    "up_token": "🔝",
-    "down_token": "⤵️",
-    "left_token": "🔙",
-    "right_token": "🔜",
-    # "scan_token": "🔛",
-    # "_token": "⤴️",
+    "up_token": "🔼",
+    "down_token": "🔽",
+    "left_token": "◀️",
+    "right_token": "▶️",
+    "home_token": "🧘",
 }
 
 @dataclass
@@ -52,11 +51,8 @@ class Pose:
 
 
 HPARAMS["poses"] = {
-    # "home": Pose([180, 225, 180], "home/reset position, or looking up to the sky"),
-    "forward": Pose(
-        [180, 180, 180],
-        "looking ahead, facing forward, default option if you are uncertain",
-    ),
+    HPARAMS["home_token"] : Pose([180, 180, 180], "home pose, default option if you are uncertain"),
+    # "face_up": Pose([180, 225, 180], "looking all the way to the sky"),
     # "face_left": Pose([180, 180, 270], "looking all the way to the left"),
     # "face_right": Pose([180, 180, 90], "looking all the way to the right"),
     # "face_down": Pose([180, 90, 180], "looking down at the ground, facing forward"),
@@ -142,7 +138,7 @@ HPARAMS["video_filename"]: str = "video.mp4"
 HPARAMS["video_duration"]: int = 1 # seconds
 HPARAMS["video_fps"]: int = 30 # frames per second
 # Movement parameters
-HPARAMS["default_pose"]: str = "forward"
+HPARAMS["default_pose"]: str = HPARAMS["home_token"]
 HPARAMS["set_servo_speed"]: int = 32 # degrees per move duration
 HPARAMS["set_servo_duration"]: float = 1.6 # seconds
 HPARAMS["set_servo_sleep"]: float = 0.001 # seconds

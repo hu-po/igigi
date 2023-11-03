@@ -9,7 +9,7 @@ async def run_llm(
     temperature: int = HPARAMS["robot_llm_temperature"],
     max_tokens: int = HPARAMS["robot_llm_max_tokens"],
 ) -> Dict[str, Any]:
-    log: str = f"Calling LLM with messages {messages}."
+    log: str = f"{HPARAMS['llm_token']} LLM using PROMPT: {model}"
     response = openai.ChatCompletion.create(
         messages=messages,
         model=model,
@@ -17,5 +17,6 @@ async def run_llm(
         max_tokens=max_tokens,
     )
     reply: str = response.choices[0].message.content
-    log += f"LLM: {reply}"
+    log += f" REPLY: {reply}"
+    print(f"\n{HPARAMS['llm_token']} {log}\n")
     return {"log": log, "reply": reply}
