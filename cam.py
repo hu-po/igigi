@@ -47,10 +47,12 @@ async def take_image(
     output_dir: str = HPARAMS["robot_data_dir"],
     flip_vertical: bool = True,  
     stereo_focus: np.ndarray = HPARAMS["stereo_focus"],
-) -> Dict[str, HPARAMS]:
+) -> Dict[str, Any]:
     output_path: str = os.path.join(output_dir, filename)
     
     cap = cv2.VideoCapture(camera.device)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, camera.width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, camera.height)
     if not cap.isOpened():
         return {"log": f"{HPARAMS['image_token']} error opening camera {camera.device}"}
     
