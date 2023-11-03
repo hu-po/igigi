@@ -13,14 +13,19 @@ class ChromeUI:
         display_number: str = "0.0",
         localhost_port: str = "7860",
     ):
+        self.nuke()
         # Start chromium browser in kiosk mode on remote display (raspberry pi)
         os.environ["DISPLAY"] = f":{display_number}"
         _cmd = ["chromium-browser", "--kiosk", f"http://localhost:{localhost_port}"]
         self.proc = subprocess.Popen(_cmd, stdin=subprocess.PIPE)
+    
+    def nuke(self):
+        os.system("killall chromium-browser")
 
     def __del__(self):
         self.proc.terminate()
-        os.system("killall chromium-browser")
+        self.nuke()
+        
 
 
 with gr.Blocks() as demo:
