@@ -36,10 +36,10 @@ class VLMDocker:
 async def run_vlm(
     prompt: str = HPARAMS["vlm_prompt"],
     docker_url: str = HPARAMS["vlm_docker_url"],
-    image_filepath: str = os.path.join(HPARAMS["brain_data_dir"], HPARAMS["image_filename"]),
 ) -> Dict[str, Any]:
     log: str = f"{HPARAMS['vlm_token']} VLM using PROMPT: {prompt}"
-    with open(image_filepath, "rb") as img_file:
+    _path = os.path.join(HPARAMS["brain_data_dir"], HPARAMS["image_filename"])
+    with open(_path, "rb") as img_file:
         response = requests.post(
             docker_url,
             headers={"Content-Type": "application/json"},

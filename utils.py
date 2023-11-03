@@ -65,7 +65,7 @@ async def find_file(
             full_path = os.path.join(directory, filename)
             file_time = os.path.getmtime(full_path)
             file_age = time.time() - file_time
-            out["log"] += f" last modified {file_age}s ago"
+            out["log"] += f" last modified {file_age:.2f}s ago"
             out[f"{file_name}_path"] = full_path
             out[f"{file_name}_age"] = file_age
             if read:
