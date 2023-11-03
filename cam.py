@@ -20,7 +20,7 @@ async def record_video(
         return {"log": f"{HPARAMS['video_token']} error opening camera {camera.device}"}
     
     # Define the codec and create VideoWriter object
-    fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(output_path, fourcc, fps, (camera.width, camera.height))
     
     for _ in range(int(fps * duration)):
