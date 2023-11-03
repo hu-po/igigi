@@ -60,11 +60,11 @@ async def take_image(
     if ret:
         if flip_vertical:  # Flip the image if needed
             frame = cv2.flip(frame, 0)
+        h, w, _ = frame.shape  # Safely get height and width
         if stereo_focus is not None:
             # Split the image vertically down the middle
-            w, h = frame.shape[1] // 2, frame.shape[0]
-            left_img, right_img = frame[:, :w], frame[:, w:2*w]
-            
+            left_img, right_img = frame[:, :w//2], frame[:, w//2:]
+
             # Calculate the bounding boxes for both eyes
             w, h = stereo_focus[0]
             x1, y1 = stereo_focus[1]
@@ -74,7 +74,7 @@ async def take_image(
             left_clipped = left_img[y1:y1+h, x1:x1+w]
             right_clipped = right_img[y2:y2+h, x2:x2+w]
 
-            cv2.imwrite(output_path+".png", cv2.hconcat([left_clipped, right_clipped]))
+            cv2.imwrite(output_path + ".png", cv2.hconcat([left_clipped, right_clipped]))
         else:
             cv2.imwrite(output_path, frame)
     else:
