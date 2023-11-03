@@ -127,7 +127,7 @@ HPARAMS["robotlog_max_age"]: int = 120 # seconds
 HPARAMS["robot_llm_prompt"]: str = "Choose the best action based on the user description. Return only the name. Here are the available actions: \n"
 HPARAMS["robot_llm_model"]: str = "gpt-3.5-turbo"
 HPARAMS["robot_llm_temperature"]: float = 0.2
-HPARAMS["robot_llm_max_tokens"]: int = 24
+HPARAMS["robot_llm_max_tokens"]: int = 1
 HPARAMS["robot_llm_timeout"]: int = 4 # seconds
 
 # Image
