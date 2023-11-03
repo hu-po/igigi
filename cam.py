@@ -74,6 +74,9 @@ async def test_cameras():
         print(result)
         result = await record_video(camera, f"test.{name}.mp4")
         print(result)
+        from utils import send_file
+        result = await send_file("robot", "brain", filename=f"test.{name}.png")
+        result = await send_file("robot", "brain", filename=f"test.{name}.mp4")
 
 if __name__ == "__main__":
     asyncio.run(test_cameras())

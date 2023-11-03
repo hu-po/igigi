@@ -4,7 +4,7 @@ import shutil
 
 from hparams import HPARAMS, Task
 from utils import find_file, send_file, task_batch, write_log
-from record import take_image
+from cam import take_image
 from llm import run_llm
 from servos import Servos, set_servos
 
