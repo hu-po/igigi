@@ -74,7 +74,7 @@ async def take_image(
             left_clipped = left_img[y1:y1+h, x1:x1+w]
             right_clipped = right_img[y2:y2+h, x2:x2+w]
 
-            cv2.imwrite(output_path, cv2.hconcat([left_clipped, right_clipped]))
+            cv2.imwrite(output_path+".png", cv2.hconcat([left_clipped, right_clipped]))
         else:
             cv2.imwrite(output_path, frame)
     else:
