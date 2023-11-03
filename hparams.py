@@ -91,11 +91,11 @@ HPARAMS["cameras"] = {
         desc="front facing stereo camera",
     ),
     "mono": Camera(
-        device="/dev/video2",
+        device="/dev/video3",
         width=640,
         height=480,
         desc="front facing monocular camera, forehead",
-    ),
+    )
 }
 
 # HACK: No explicit Coroutine type

@@ -74,7 +74,7 @@ async def test_cameras():
         print(result)
         result = await record_video(camera, f"test.{name}.mp4")
         print(result)
-        from utils import send_file
+        # from utils import send_file
         # result = await send_file("test_img", "robot", "brain", _filename=f"test.{name}.png")
         # result = await send_file("test_vid", "robot", "brain", _filename=f"test.{name}.mp4")
 
