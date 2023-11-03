@@ -80,10 +80,11 @@ async def send_file(
     file_name: str,
     local_name: str = HPARAMS["robot_username"],
     remote_name: str = HPARAMS["brain_username"],
-    filename: str = None,
+    _filename: str = None,
 ) -> dict:
-    if not filename:
-        filename: str = HPARAMS[f"{file_name}_filename"]
+    filename: str = HPARAMS[f"{file_name}_filename"]
+    if _filename:
+        filename = _filename
     local_dir_path: str = HPARAMS[f"{local_name}_data_dir"]
     remote_dir_path: str = HPARAMS[f"{remote_name}_data_dir"]
     remote_username: str = HPARAMS[f"{remote_name}_username"]
