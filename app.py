@@ -1,7 +1,5 @@
-import asyncio
 import os
 import subprocess
-import time
 
 import gradio as gr
 from hparams import HPARAMS
@@ -30,14 +28,12 @@ class ChromeUI:
     def __del__(self):
         self.proc.terminate()
         self.nuke()
-        
-
 
 with gr.Blocks() as demo:
     gr.Markdown("# IGIGI")
     with gr.Column():
         _path = os.path.join(HPARAMS["robot_data_dir"], "image.png") # HPARAMS["image_filename"])
-        gr.Image(_path)
+        img = gr.Image(_path, every=1)        
         # _path = os.path.join(HPARAMS["robot_data_dir"], HPARAMS["robotlog_filename"])
         # with open(_path, "r") as f:
         #     text = f.read()
@@ -47,3 +43,4 @@ with gr.Blocks() as demo:
 if __name__ == "__main__":
     ui = ChromeUI()
     demo.queue().launch()
+
