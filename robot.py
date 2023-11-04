@@ -14,7 +14,7 @@ def _loop():
     camera = OpenCVCam()
     tasks = [
         Task("clear_data", clear_data("robot")),
-        Task("set_servos", servos.set_servos("forward", servos)),
+        Task("set_servos", servos.set_servos("forward")),
         Task("take_image", camera.take_image()),
     ]
     state = asyncio.run(task_batch(tasks, "robot", ordered=True))
@@ -52,7 +52,7 @@ def _loop():
         # always move
         if state.get("reply", None) is not None:
             # if action, move servos
-            tasks.append(Task("set_servos", servos.set_servos(state["reply"], servos)))
+            tasks.append(Task("set_servos", servos.set_servos(state["reply"])))
 
 if __name__ == "__main__":
     print("Starting robot main loop.")
