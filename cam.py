@@ -40,6 +40,10 @@ class OpenCVCam:
                 # Split the image vertically down the middle
                 left_img, right_img = frame[:, :w//2], frame[:, w//2:]
 
+                print(f"stereo_focus[0]{stereo_focus[0]}")
+                print(f"stereo_focus[1]{stereo_focus[1]}")
+                print(f"stereo_focus[2]{stereo_focus[2]}")
+
                 # Calculate the bounding boxes for both eyes
                 w, h = stereo_focus[0]
                 x1, y1 = stereo_focus[1]
