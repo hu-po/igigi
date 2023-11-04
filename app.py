@@ -14,6 +14,8 @@ class ChromeUI:
         localhost_port: str = "7860",
     ):
         self.nuke()
+        self.wake()
+        # Wake up screen (raspberry pi)
         # Start chromium browser in kiosk mode on remote display (raspberry pi)
         os.environ["DISPLAY"] = f":{display_number}"
         _cmd = ["chromium-browser", "--kiosk", f"http://localhost:{localhost_port}"]
@@ -21,6 +23,10 @@ class ChromeUI:
     
     def nuke(self):
         os.system("killall chromium-browser")
+
+    def wake(self):
+        os.system('export DISPLAY=:0')
+        os.system('xdotool key shift')
 
     def __del__(self):
         self.proc.terminate()

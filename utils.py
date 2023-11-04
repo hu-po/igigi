@@ -128,7 +128,6 @@ async def write_log(
     return out
 
 def make_clean_data_dir(
-    log: str,
     node_name: str,
 ) -> Dict[str, Any]:
     node_token: str = HPARAMS[f"{node_name}_token"]
