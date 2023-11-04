@@ -44,10 +44,14 @@ class OpenCVCam:
                 w, h = stereo_focus[0]
                 x1, y1 = stereo_focus[1]
                 x2, y2 = stereo_focus[2]
+                print(f"left: {x1}, {y1}, {w}, {h}")
+                print(f"right: {x2}, {y2}, {w}, {h}")
                 x1, y1 = int(x1 - w//2), int(y1 - h//2)
                 x2, y2 = int(x2 - w//2), int(y2 - h//2)
                 left_clipped = left_img[y1:y1+h, x1:x1+w]
                 right_clipped = right_img[y2:y2+h, x2:x2+w]
+                print(f"left clipped: {left_clipped.shape}")
+                print(f"right clipped: {right_clipped.shape}")
 
                 cv2.imwrite(output_path, cv2.hconcat([left_clipped, right_clipped]))
             else:
