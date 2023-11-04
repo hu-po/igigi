@@ -3,20 +3,13 @@ import os
 import shutil
 
 from hparams import HPARAMS, Task
-from utils import find_file, send_file, task_batch, write_log
+from utils import find_file, send_file, task_batch, write_log, make_clean_data_dir
 from vlm import VLMDocker, run_vlm
 
 
 def _loop():
-    if os.path.exists(HPARAMS["brain_data_dir"]):
-        shutil.rmtree(HPARAMS["brain_data_dir"])
-    os.makedirs(HPARAMS["brain_data_dir"], exist_ok=True)
-    _ = VLMDocker()
-    # startup tasks
-    tasks = [
-        Task("find_file", find_file("image", "brain")),
-        Task("find_file", find_file("brainlog", "brain", read=True)),
-    ]
+    docker_proc = VLMDocker()
+    tasks = [Task("clear_data", make_clean_data_dir("robot"))]
     while True:
         state = asyncio.run(task_batch(tasks, "brain"))
         # Reset tasks

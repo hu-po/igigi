@@ -3,28 +3,24 @@ import os
 import shutil
 
 from hparams import HPARAMS, Task
-from utils import find_file, send_file, task_batch, write_log
+from utils import find_file, send_file, task_batch, write_log, make_clean_data_dir
 from llm import run_llm
 from cam import OpenCVCam
 from servos import Servos
 
 
 def _loop():
-    if os.path.exists(HPARAMS["robot_data_dir"]):
-        shutil.rmtree(HPARAMS["robot_data_dir"])
-    os.makedirs(HPARAMS["robot_data_dir"], exist_ok=True)
-    # Robot is a singleton, requires state
     servos = Servos()
     camera = OpenCVCam()
     tasks = [
-        Task("find_file", find_file("vlmout", "robot", read=True)),
-        Task("find_file", find_file("robotlog", "robot", read=True)),
+        Task("clear_data", make_clean_data_dir("robot")),
         Task("set_servos", servos.set_servos("forward", servos)),
         Task("take_image", camera.take_image()),
     ]
+    state = asyncio.run(task_batch(tasks, "robot", ordered=True))
     while True:
         state = asyncio.run(task_batch(tasks, "robot"))
-        # Reset tasks
+        # Reset task
         tasks = []
         # if log hasn't been saved in a while
         if state.get("robotlog_age", 0) > HPARAMS["robotlog_max_age"] or state.get("robotlog", None) is None:

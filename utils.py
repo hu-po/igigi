@@ -2,6 +2,7 @@ import os
 import asyncio
 import time
 from typing import Any, Dict, List
+import shutil
 
 from hparams import HPARAMS, Task
 
@@ -17,7 +18,7 @@ async def time_it(task: Task) -> Dict[str, Any]:
     result["log"] = f"{prefix}\n{result['log']}\n{suffix}"
     return result
 
-async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
+async def task_batch(task_batch: List[Task], node_name: str, ordered: bool = False) -> Dict[str, Any]:
     node_token: str = HPARAMS[f"{node_name}_token"]
     if len(task_batch) == 0:
         log: str = f"{node_token} no tasks to run."
@@ -26,7 +27,17 @@ async def task_batch(task_batch: List[Task], node_name: str) -> Dict[str, Any]:
     prefix: str = f"{node_token} started batch of {len(task_batch)} tasks at {time.strftime(HPARAMS['time_format'])}"
     print(prefix)
     out: Dict[str, Any] = {"log": f"{prefix}\n"}
-    results = await asyncio.gather(*[time_it(task) for task in task_batch], return_exceptions=True)
+    # HACK: gross way of toggling in-order, forgive my sins.
+    if ordered:
+        results = []
+        for task in task_batch:
+            try:
+                result = await time_it(task)
+            except Exception as e:
+                result = e
+            results.append(result)
+    else:
+        results = await asyncio.gather(*[time_it(task) for task in task_batch], return_exceptions=True)
     for i, result in enumerate(results):
         if isinstance(result, Exception):
             if isinstance(result, asyncio.TimeoutError):
@@ -115,3 +126,14 @@ async def write_log(
     with open(full_path, "a") as f:
         f.write(log)
     return out
+
+def make_clean_data_dir(
+    log: str,
+    node_name: str,
+) -> Dict[str, Any]:
+    node_token: str = HPARAMS[f"{node_name}_token"]
+    directory: str = HPARAMS[f"{node_name}_data_dir"]
+    if os.path.exists(directory):
+        shutil.rmtree(directory)
+    os.makedirs(directory, exist_ok=True)
+    return {"log": f"{HPARAMS['clean_token']} clear data {node_token}"}

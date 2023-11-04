@@ -17,6 +17,7 @@ HPARAMS: Dict[str, Any] = {
     "find_token" : "🔍",
     "fail_token" : "❌",
     "send_token" : "📤",
+    "clean_token" : "🧹",
     "time_token": "⏱️",
     "vlm_token": "👁️‍🗨️",
     "llm_token": "💬",
