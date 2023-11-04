@@ -20,7 +20,7 @@ def _loop():
         # always check for brainlog
         tasks.append(Task("find_file", find_file("brainlog", "brain", read=True)))
         # if there is an image, run VLM
-        if state.get("image_output_path", None) is not None:
+        if state.get("image_path", None) is not None:
             tasks.append(Task("run_vlm", run_vlm(), HPARAMS["vlm_timeout"]))
         else:
             tasks.append(Task("find_file", find_file("image", "brain")))

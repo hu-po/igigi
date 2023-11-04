@@ -34,7 +34,7 @@ def _loop():
         # always capture image
         tasks.append(Task("take_image", camera.take_image()))
         # if image, send it to brain
-        if state.get("image_output_path", None) is not None:
+        if state.get("image_path", None) is not None:
             tasks.append(Task("send_file", send_file("image", "robot", "brain")))
         # TODO: if video, send it to viewr
         # if vlmouts, call llm
