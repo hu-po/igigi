@@ -18,6 +18,7 @@ def _loop():
         Task("take_image", camera.take_image()),
     ]
     state = asyncio.run(task_batch(tasks, "robot", ordered=True))
+    tasks = []
     while True:
         state = asyncio.run(task_batch(tasks, "robot"))
         # Reset task

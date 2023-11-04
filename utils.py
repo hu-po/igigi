@@ -24,7 +24,10 @@ async def task_batch(task_batch: List[Task], node_name: str, ordered: bool = Fal
         log: str = f"{node_token} no tasks to run."
         print(log)
         return {"log": log}
-    prefix: str = f"{node_token} started batch of {len(task_batch)} tasks at {time.strftime(HPARAMS['time_format'])}"
+    prefix: str = f"{node_token} started batch of {len(task_batch)} tasks"
+    if ordered:
+        prefix += " in order"
+    prefix += f" at {time.strftime(HPARAMS['time_format'])}"
     print(prefix)
     out: Dict[str, Any] = {"log": f"{prefix}\n"}
     # HACK: gross way of toggling in-order, forgive my sins.

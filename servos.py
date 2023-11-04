@@ -227,16 +227,16 @@ class Servos:
 async def test_servos() -> None:
     print("Testing servos")
     servos = Servos()
-    for name, pose in HPARAMS["poses"].items():
-        print(f"Moving to pose {name}")
-        result = await servos.set_servos(name)
-        print(result)
-        time.sleep(1)
-    for name, move in HPARAMS["moves"].items():
-        print(f"Moving with move {name}")
-        result = await servos.set_servos(name)
-        print(result)
-        time.sleep(1)
+    for _ in range(10):
+        for name, pose in HPARAMS["poses"].items():
+            print(f"Moving to pose {name}")
+            result = await servos.set_servos(name)
+            print(result)
+        for name, move in HPARAMS["moves"].items():
+            print(f"Moving with move {name}")
+            result = await servos.set_servos(name)
+            print(result)
+        time.sleep(2)    
 
 
 def limp_mode() -> None:
