@@ -50,10 +50,10 @@ class OpenCVCam:
                 x2, y2 = stereo_focus[2]
                 print(f"left: {x1}, {y1}, {w}, {h}")
                 print(f"right: {x2}, {y2}, {w}, {h}")
-                x1, y1 = int(x1 - w//2), int(y1 - h//2)
-                x2, y2 = int(x2 - w//2), int(y2 - h//2)
-                left_clipped = left_img[y1:y1+h, x1:x1+w]
-                right_clipped = right_img[y2:y2+h, x2:x2+w]
+                half_h = h//2
+                half_w = w//2
+                left_clipped = left_img[y1-half_h:y1+half_h, x1-half_w:x1+half_w]
+                right_clipped = right_img[y2-half_h:y2+half_h, x2-half_w:x2+half_w] 
                 print(f"left clipped: {left_clipped.shape}")
                 print(f"right clipped: {right_clipped.shape}")
 
@@ -63,7 +63,7 @@ class OpenCVCam:
             return {
                 "log": f"{HPARAMS['image_token']} image captured",
                 "image_output_path" : output_path,
-                }
+            }
         else:
             return {"log": f"{HPARAMS['image_token']}{HPARAMS['fail_token']} frame empty"}
 
