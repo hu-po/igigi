@@ -136,8 +136,8 @@ HPARAMS["robot_llm_timeout"]: int = 4 # seconds
 
 # Movement parameters
 HPARAMS["default_pose"]: str = HPARAMS["home_token"]
-HPARAMS["set_servo_speed"]: int = 32 # degrees per move duration
-HPARAMS["set_servo_duration"]: float = 3 # seconds
+HPARAMS["set_servo_speed"]: int = 12 # degrees per move duration
+HPARAMS["set_servo_duration"]: float = 1 # seconds
 HPARAMS["set_servo_sleep"]: float = 0.01 # seconds
 # Raw servo parameters
 HPARAMS["protocol_version"]: float = 2.0
