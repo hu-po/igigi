@@ -33,7 +33,7 @@ with gr.Blocks() as demo:
     gr.Markdown("# IGIGI")
     with gr.Column():
         _path = os.path.join(HPARAMS["robot_data_dir"], "image.png") # HPARAMS["image_filename"])
-        img = gr.Image(_path, every=1, show_download_button=False, show_label=False)
+        img = gr.Image(_path, type="filepath", every=1, show_download_button=False, show_label=False)
         # _path = os.path.join(HPARAMS["robot_data_dir"], HPARAMS["robotlog_filename"])
         # with open(_path, "r") as f:
         #     text = f.read()
