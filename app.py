@@ -25,7 +25,6 @@ class ChromeUI:
         os.system("killall chromium-browser")
 
     def wake(self):
-        os.system('export DISPLAY=:0')
         os.system('xdotool key shift')
 
     def __del__(self):
