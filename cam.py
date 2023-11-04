@@ -60,7 +60,10 @@ class OpenCVCam:
                 cv2.imwrite(output_path, cv2.hconcat([left_clipped, right_clipped]))
             else:
                 cv2.imwrite(output_path, frame)
-            return {"log": f"{HPARAMS['image_token']} image captured"}
+            return {
+                "log": f"{HPARAMS['image_token']} image captured",
+                "image_output_path" : output_path,
+                }
         else:
             return {"log": f"{HPARAMS['image_token']}{HPARAMS['fail_token']} frame empty"}
 
