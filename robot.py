@@ -57,6 +57,8 @@ def _loop():
         if state.get("reply", None) is not None:
             # if action, move servos
             tasks.append(Task("set_servos", servos.set_servos(state["reply"])))
+        else:
+            tasks.append(Task("set_servos", servos.set_servos("forward")))
 
 if __name__ == "__main__":
     print("Starting robot main loop.")
