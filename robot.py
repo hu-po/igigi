@@ -24,8 +24,9 @@ def _loop():
         # Reset task
         tasks = []
         # if log hasn't been saved in a while
-        if state.get("robotlog_age", 0) > HPARAMS["robotlog_max_age"] or state.get("robotlog", None) is None:
-            tasks.append(Task("write_log", write_log(state["log"], "robot")))
+        if state.get("robotlog", None) is None:
+            _clean = (state.get("robotlog_age", 0) > HPARAMS["robotlog_max_age"])
+            tasks.append(Task("write_log", write_log(state["log"], "robot", clean=_clean)))
         # always check for brainlog
         tasks.append(Task("find_file", find_file("robotlog", "robot", read=True)))
         # always capture image
