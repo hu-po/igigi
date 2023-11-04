@@ -13,6 +13,8 @@ def _loop():
     servos = Servos()
     camera = OpenCVCam()
     tasks = [
+        Task("find_file", find_file("robotlog", "robot", read=True)),
+        Task("find_file", find_file("vlmout", "robot", read=True)),
         Task("clear_data", clear_data("robot")),
         Task("set_servos", servos.set_servos("forward")),
         Task("take_image", camera.take_image()),

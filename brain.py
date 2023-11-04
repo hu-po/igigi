@@ -19,11 +19,11 @@ def _loop():
             tasks.append(Task("write_log", write_log(state["log"], "brain", clean=_clean)))
         # always check for brainlog
         tasks.append(Task("find_file", find_file("brainlog", "brain", read=True)))
-        # always check for image
-        tasks.append(Task("find_file", find_file("image", "brain")))
         # if there is an image, run VLM
-        if state.get("image_path", None) is not None:
+        if state.get("image_output_path", None) is not None:
             tasks.append(Task("run_vlm", run_vlm(), HPARAMS["vlm_timeout"]))
+        else:
+            tasks.append(Task("find_file", find_file("image", "brain")))
         # if there is a VLM output, write and send
         if state.get("reply", None) is not None:
             _path = os.path.join(HPARAMS["brain_data_dir"], HPARAMS["vlmout_filename"])
