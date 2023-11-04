@@ -71,10 +71,10 @@ async def test():
     print("testing camera")
     cam = OpenCVCam()
     await clear_data("robot")
-    result = await cam.take_image("test.png")
+    result = await cam.take_image()
     print(result)
-    result = await cam.record_video("test.mp4")
-    print(result)
+    # result = await cam.record_video("test.mp4")
+    # print(result)
 
 if __name__ == "__main__":
     asyncio.run(test())
