@@ -8,6 +8,7 @@ from hparams import HPARAMS, Camera
 
 class OpenCVCam:
     def __init__(self, camera: Camera = HPARAMS["camera"]):
+        self.camera: Camera = camera
         self.cap = cv2.VideoCapture(camera.device)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, camera.width)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, camera.height)
@@ -24,7 +25,7 @@ class OpenCVCam:
     ) -> Dict[str, Any]:
         output_path: str = os.path.join(output_dir, filename)
         if not self.cap.isOpened():
-            return {"log": f"{HPARAMS['image_token']} error opening camera {camera.device}"}
+            return {"log": f"{HPARAMS['image_token']}{HPARAMS['fail_token']} camera not open"}
         
         ret, frame = self.cap.read()
         if ret:
@@ -44,11 +45,11 @@ class OpenCVCam:
                 left_clipped = left_img[y1:y1+h, x1:x1+w]
                 right_clipped = right_img[y2:y2+h, x2:x2+w]
 
-                cv2.imwrite(output_path + ".png", cv2.hconcat([left_clipped, right_clipped]))
+                cv2.imwrite(output_path, cv2.hconcat([left_clipped, right_clipped]))
             else:
                 cv2.imwrite(output_path, frame)
         else:
-            return {"log": f"{HPARAMS['image_token']} error capturing image from {camera.device}"}
+            return {"log": f"{HPARAMS['image_token']}{HPARAMS['fail_token']} frame empty"}
 
     async def record_video(
         self,
