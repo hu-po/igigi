@@ -83,20 +83,13 @@ class Camera:
     desc: str  # description of camera for llm use
 
 
-HPARAMS["cameras"] = {
-    "stereo": Camera(
+HPARAMS["camera"] = Camera(
+        desc="front facing stereo camera",
         device="/dev/video0",
         width=1280,
         height=480,
-        desc="front facing stereo camera",
-    ),
-    # "mono": Camera(
-    #     device="/dev/video2",
-    #     width=640,
-    #     height=480,
-    #     desc="front facing monocular camera, forehead",
-    # )
-}
+    )
+
 # custom clipping, dimmension is final size, centerpoints are (x,y) of normalized center of crop
 HPARAMS["stereo_focus"] = [
     [640,480], # dimensions

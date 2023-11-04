@@ -4,9 +4,9 @@ import shutil
 
 from hparams import HPARAMS, Task
 from utils import find_file, send_file, task_batch, write_log
-from cam import take_image
 from llm import run_llm
-from servos import Servos, set_servos
+from cam import OpenCVCam
+from servos import Servos
 
 
 def _loop():
@@ -15,11 +15,12 @@ def _loop():
     os.makedirs(HPARAMS["robot_data_dir"], exist_ok=True)
     # Robot is a singleton, requires state
     servos = Servos()
+    camera = OpenCVCam()
     tasks = [
         Task("find_file", find_file("vlmout", "robot", read=True)),
         Task("find_file", find_file("robotlog", "robot", read=True)),
-        Task("set_servos", set_servos("forward", servos)),
-        Task("take_image", take_image(HPARAMS["cameras"]["stereo"])),
+        Task("set_servos", servos.set_servos("forward", servos)),
+        Task("take_image", camera.take_image()),
     ]
     while True:
         state = asyncio.run(task_batch(tasks, "robot"))
@@ -31,7 +32,7 @@ def _loop():
         # always check for brainlog
         tasks.append(Task("find_file", find_file("robotlog", "robot", read=True)))
         # always capture image
-        tasks.append(Task("take_image", take_image(HPARAMS["cameras"]["stereo"])))
+        tasks.append(Task("take_image", camera.take_image()))
         # if image, send it to brain
         if state.get("image_output_path", None) is not None:
             tasks.append(Task("send_file", send_file("image", "robot", "brain")))
@@ -55,7 +56,7 @@ def _loop():
         # always move
         if state.get("reply", None) is not None:
             # if action, move servos
-            tasks.append(Task("set_servos", set_servos(state["reply"], servos)))
+            tasks.append(Task("set_servos", servos.set_servos(state["reply"], servos)))
 
 if __name__ == "__main__":
     print("Starting robot main loop.")
