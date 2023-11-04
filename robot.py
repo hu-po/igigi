@@ -3,7 +3,7 @@ import os
 import shutil
 
 from hparams import HPARAMS, Task
-from utils import find_file, send_file, task_batch, write_log, make_clean_data_dir
+from utils import find_file, send_file, task_batch, write_log, clear_data
 from llm import run_llm
 from cam import OpenCVCam
 from servos import Servos
@@ -13,7 +13,7 @@ def _loop():
     servos = Servos()
     camera = OpenCVCam()
     tasks = [
-        Task("clear_data", make_clean_data_dir("robot")),
+        Task("clear_data", clear_data("robot")),
         Task("set_servos", servos.set_servos("forward", servos)),
         Task("take_image", camera.take_image()),
     ]

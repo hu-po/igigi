@@ -192,7 +192,7 @@ class Servos:
             if desired_move is not None:
                 move_vector = [x * speed for x in desired_move.vector]
                 out["log"] += f" a move with vector {move_vector}"
-                true_pos = self.servos._read_pos()
+                true_pos = self._read_pos()
                 goal_pos = [move_vector[i] + true_pos[i] for i in range(len(move_vector))]
             else:
                 out["log"] += f"... invalid, set to pose {default_pose}"
@@ -206,7 +206,7 @@ class Servos:
             if elapsed_time > duration.total_seconds():
                 out["log"] += f"... completed! took {elapsed_time}s"
                 break
-            true_pos = self.servos._read_pos()
+            true_pos = self._read_pos()
             out["log"] += f", true_pos={true_pos}"
             # Interpolate between the current position and the goal position
             # based on the fraction of time elapsed
@@ -216,9 +216,9 @@ class Servos:
                 for i in range(len(goal_pos))
             ]
             out["log"] += f", waypoint={waypoint}"
-            self.servos._write_position(waypoint)
+            self._write_position(waypoint)
             await asyncio.sleep(sleep)
-        true_pos = self.servos._read_pos()
+        true_pos = self._read_pos()
         out["log"] += f", true_pos={true_pos}"
         out["prev_pos"] = true_pos
         return out

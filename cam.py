@@ -5,6 +5,7 @@ import numpy as np
 from typing import Any, Dict
 
 from hparams import HPARAMS, Camera
+from utils import clear_data
 
 class OpenCVCam:
     def __init__(self, camera: Camera = HPARAMS["camera"]):
@@ -67,8 +68,9 @@ class OpenCVCam:
         pass
 
 async def test():
-    cam = OpenCVCam()
     print("testing camera")
+    cam = OpenCVCam()
+    await clear_data("robot")
     result = await cam.take_image("test.png")
     print(result)
     result = await cam.record_video("test.mp4")
