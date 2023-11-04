@@ -33,7 +33,10 @@ class OpenCVCam:
             if flip_vertical:  # Flip the image if needed
                 frame = cv2.flip(frame, 0)
             h, w, _ = frame.shape  # Safely get height and width
+            print(f"frame shape: {frame.shape}")
+            print(f"sterero focus: {stereo_focus}")
             if stereo_focus is not None:
+                print("stereo focus")
                 # Split the image vertically down the middle
                 left_img, right_img = frame[:, :w//2], frame[:, w//2:]
 
