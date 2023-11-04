@@ -178,7 +178,7 @@ class Servos:
         default_pose: str = HPARAMS["default_pose"],
         move_dict: Dict[str, Move] = HPARAMS["moves"],
         speed: int = HPARAMS["set_servo_speed"],
-        duration: int = HPARAMS["set_servo_duration"],
+        duration: int = HPARAMS["set_servo_timeout"],
         sleep: float = HPARAMS["set_servo_sleep"],
     ) -> Dict[str, Any]:
         out: Dict[str, Any] = {"log": f"{HPARAMS['robot_token']} taking action {action}"}

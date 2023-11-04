@@ -93,7 +93,7 @@ HPARAMS["camera"] = Camera(
 
 # custom clipping, dimmension is final size, centerpoints are (x,y) of normalized center of crop
 HPARAMS["stereo_focus"] = [
-    [640,480], # dimensions
+    [224,224], # dimensions
     [320,240], # center point left
     [960,240], # center points right
 ]
@@ -117,7 +117,7 @@ HPARAMS["brain_username"]: str = "oop"
 HPARAMS["brain_data_dir"]: str = "/home/oop/dev/data/"
 HPARAMS["brainlog_filename"]: str = f"log.{HPARAMS['brain_token']}.txt"
 HPARAMS["brainlog_max_age"]: int = 6 # seconds
-HPARAMS["vlm_prompt"]: str = "Can I see a person? How should I move my head to find the person? Say up, down, left, right, or unsure"
+HPARAMS["vlm_prompt"]: str = "Where is the image is the person? Reply UP, DOWN, LEFT, RIGHT, or UNSURE"
 HPARAMS["vlm_docker_url"]: str = "http://localhost:5000/predictions"
 HPARAMS["vlmout_filename"]: str = "vlmout.txt"
 HPARAMS["vlm_timeout"]: int = 4 # seconds
@@ -137,7 +137,7 @@ HPARAMS["robot_llm_timeout"]: int = 4 # seconds
 # Movement parameters
 HPARAMS["default_pose"]: str = HPARAMS["home_token"]
 HPARAMS["set_servo_speed"]: int = 64 # degrees per move duration
-HPARAMS["set_servo_duration"]: float = 3 # seconds
+HPARAMS["set_servo_timeout"]: float = 3 # seconds
 HPARAMS["set_servo_sleep"]: float = 0.01 # seconds
 # Raw servo parameters
 HPARAMS["protocol_version"]: float = 2.0
