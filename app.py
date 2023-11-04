@@ -36,7 +36,7 @@ class ChromeUI:
 with gr.Blocks() as demo:
     gr.Markdown("# IGIGI")
     with gr.Column():
-        _path = os.path.join(HPARAMS["robot_data_dir"], "test.png") # HPARAMS["image_filename"])
+        _path = os.path.join(HPARAMS["robot_data_dir"], "image.png") # HPARAMS["image_filename"])
         gr.Image(_path)
         # _path = os.path.join(HPARAMS["robot_data_dir"], HPARAMS["robotlog_filename"])
         # with open(_path, "r") as f:
