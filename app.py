@@ -38,6 +38,7 @@ with gr.Blocks() as demo:
         # with open(_path, "r") as f:
         #     text = f.read()
         # gr.Textbox(text, label="Text")
+        img.change(fn=lambda x: x, inputs=[img], outputs=[img])
 
 
 if __name__ == "__main__":
