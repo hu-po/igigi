@@ -32,31 +32,20 @@ class OpenCVCam:
         if ret:
             if flip_vertical:  # Flip the image if needed
                 frame = cv2.flip(frame, 0)
-            h, w, _ = frame.shape  # Safely get height and width
-            print(f"frame shape: {frame.shape}")
-            print(f"sterero focus: {stereo_focus}")
+            h, w, _ = frame.shape
             if stereo_focus is not None:
-                print("stereo focus")
-                # Split the image vertically down the middle
-                left_img, right_img = frame[:, :w//2], frame[:, w//2:]
-
-                print(f"stereo_focus[0]{stereo_focus[0]}")
-                print(f"stereo_focus[1]{stereo_focus[1]}")
-                print(f"stereo_focus[2]{stereo_focus[2]}")
-
                 # Calculate the bounding boxes for both eyes
                 w, h = stereo_focus[0]
                 x1, y1 = stereo_focus[1]
                 x2, y2 = stereo_focus[2]
-                print(f"left: {x1}, {y1}, {w}, {h}")
-                print(f"right: {x2}, {y2}, {w}, {h}")
                 half_h = h//2
                 half_w = w//2
-                left_clipped = left_img[y1-half_h:y1+half_h, x1-half_w:x1+half_w]
-                right_clipped = right_img[y2-half_h:y2+half_h, x2-half_w:x2+half_w] 
+                left_clipped = frame[y1-half_h:y1+half_h, x1-half_w:x1+half_w]
+                right_clipped = frame[y2-half_h:y2+half_h, x2-half_w:x2+half_w] 
+                print(f"left: {x1}, {y1}, {w}, {h}")
+                print(f"right: {x2}, {y2}, {w}, {h}")
                 print(f"left clipped: {left_clipped.shape}")
                 print(f"right clipped: {right_clipped.shape}")
-
                 cv2.imwrite(output_path, cv2.hconcat([left_clipped, right_clipped]))
             else:
                 cv2.imwrite(output_path, frame)
